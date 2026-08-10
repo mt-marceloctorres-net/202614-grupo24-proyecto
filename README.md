@@ -7,6 +7,7 @@
   - [Estructura del Proyecto](#estructura-del-proyecto)
   - [Archivo de configuración](#archivo-de-configuración)
   - [Estructura de cada aplicación](#estructura-de-cada-aplicación)
+  - [Decisión de tecnologías](#decisión-de-tecnologías)
 
 ## Estructura del Proyecto
 
@@ -46,3 +47,13 @@ Cada aplicación debe seguir las siguientes reglas:
 4. El nombre y tag de cada imagen deben ser agregadas en el archivo `config.yaml` y deben corresponder a los mismos que se usan en la configuración de despliegue de k8s. Si la configuración de este archivo no es correcta, su evaluación fallará y la nota será de cero.
 
 Lo invitamos a revisar el archivo `README.md` de la carpeta [pets](./pets_app/) donde encontrará la documentación para utilizar ese proyecto en `Python` como su ejemplo.
+
+## Decisión de tecnologías
+
+El equipo (Cargo tu encargo) construirá las 4 aplicaciones (`users_app`, `routes_app`, `posts_app`, `offers_app`) con:
+
+- **Lenguaje/framework**: Python 3.11 + FastAPI
+- **Gestión de dependencias**: Poetry
+- **Pruebas**: Pytest
+- **Base de datos**: PostgreSQL, una por aplicación
+- **Arquitectura**: hexagonal (dominio / puertos / adaptadores / entrypoints), siguiendo el patrón de `pets_app/` pero con adaptador Postgres en vez de memoria
