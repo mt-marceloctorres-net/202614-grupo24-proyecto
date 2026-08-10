@@ -56,4 +56,7 @@ El equipo (Cargo tu encargo) construirá las 4 aplicaciones (`users_app`, `route
 - **Gestión de dependencias**: Poetry
 - **Pruebas**: Pytest
 - **Base de datos**: PostgreSQL, una por aplicación
+- **Acceso a datos**: SQLAlchemy (síncrono) + `psycopg2-binary` como driver, en el adaptador Postgres de cada app
 - **Arquitectura**: hexagonal (dominio / puertos / adaptadores / entrypoints), siguiendo el patrón de `pets_app/` pero con adaptador Postgres en vez de memoria
+
+> Ver `users_app/` (ya construido) como ejemplo concreto de este patrón — es la referencia a seguir para `routes_app`, `posts_app` y `offers_app`.
