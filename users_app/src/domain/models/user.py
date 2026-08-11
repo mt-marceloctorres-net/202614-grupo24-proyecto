@@ -16,7 +16,7 @@ class User(BaseModel):
     """Modelo de dominio Usuario."""
 
     id: str | None = None
-    username: str = Field(min_length=1, pattern=r"^\S+$")
+    username: str = Field(min_length=1, pattern=r"^[A-Za-z0-9_.-]+$")
     email: EmailStr
     phoneNumber: str | None = None
     dni: str | None = None
