@@ -2,8 +2,10 @@ from adapters.postgres.database import SessionLocal
 from adapters.postgres.user_repository_adapter import PostgresUserRepositoryAdapter
 from domain.use_cases.authenticate_user_use_case import AuthenticateUserUseCase
 from domain.use_cases.base_use_case import BaseUseCase
+from domain.use_cases.count_users_use_case import CountUsersUseCase
 from domain.use_cases.create_user_use_case import CreateUserUseCase
 from domain.use_cases.get_me_use_case import GetMeUseCase
+from domain.use_cases.reset_users_use_case import ResetUsersUseCase
 from domain.use_cases.update_user_use_case import UpdateUserUseCase
 
 repository: PostgresUserRepositoryAdapter = PostgresUserRepositoryAdapter(SessionLocal)
@@ -29,5 +31,11 @@ def build_get_me_use_case() -> BaseUseCase:
     return GetMeUseCase(repository)
 
 
-# Los `build_*_use_case` técnicos (/count, /ping, /reset) se agregan en el
-# issue #12.
+def build_count_users_use_case() -> BaseUseCase:
+    """Caso de uso de conteo de usuarios."""
+    return CountUsersUseCase(repository)
+
+
+def build_reset_users_use_case() -> BaseUseCase:
+    """Caso de uso de borrado total de usuarios."""
+    return ResetUsersUseCase(repository)

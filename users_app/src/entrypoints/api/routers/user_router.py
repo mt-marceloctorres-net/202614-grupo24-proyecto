@@ -1,13 +1,16 @@
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import PlainTextResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, EmailStr, Field
 
 from assembly import (
     build_authenticate_user_use_case,
+    build_count_users_use_case,
     build_create_user_use_case,
     build_get_me_use_case,
+    build_reset_users_use_case,
     build_update_user_use_case,
 )
 from domain.models.user import UserStatus
@@ -59,6 +62,14 @@ class AuthResponse(BaseModel):
     id: str
     token: str
     expireAt: datetime
+
+
+class CountResponse(BaseModel):
+    count: int
+
+
+class ResetResponse(BaseModel):
+    msg: str
 
 
 class MeResponse(BaseModel):
@@ -145,3 +156,22 @@ def get_me(
         phoneNumber=user.phoneNumber,
         status=user.status,
     )
+
+
+@router.get("/count", response_model=CountResponse)
+def count_users(use_case: BaseUseCase = Depends(build_count_users_use_case)):
+    """Cuenta cuántos usuarios hay almacenados."""
+    return CountResponse(count=use_case.execute())
+
+
+@router.get("/ping", response_class=PlainTextResponse)
+def health_check():
+    """Healthcheck endpoint."""
+    return "pong"
+
+
+@router.post("/reset", response_model=ResetResponse)
+def reset_users(use_case: BaseUseCase = Depends(build_reset_users_use_case)):
+    """Elimina todos los usuarios."""
+    use_case.execute()
+    return ResetResponse(msg="Todos los datos fueron eliminados")
