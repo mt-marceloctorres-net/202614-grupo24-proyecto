@@ -1,16 +1,28 @@
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, EmailStr, Field
 
-from assembly import build_create_user_use_case, build_update_user_use_case
+from assembly import (
+    build_authenticate_user_use_case,
+    build_create_user_use_case,
+    build_get_me_use_case,
+    build_update_user_use_case,
+)
 from domain.models.user import UserStatus
 from domain.use_cases.base_use_case import BaseUseCase
-from errors import InvalidRequestError, UserAlreadyExistsError, UserNotFoundError
+from errors import (
+    InvalidCredentialsError,
+    InvalidRequestError,
+    InvalidTokenError,
+    UserAlreadyExistsError,
+    UserNotFoundError,
+)
 
-# Los endpoints de autenticación (/auth, /me) y técnicos (/count, /ping,
-# /reset) se agregan en los issues #11 y #12.
+# Los endpoints técnicos (/count, /ping, /reset) se agregan en el issue #12.
 router = APIRouter(prefix="/users")
+bearer_scheme = HTTPBearer()
 
 
 class CreateUserRequest(BaseModel):
@@ -36,6 +48,27 @@ class UpdateUserRequest(BaseModel):
 
 class UpdateUserResponse(BaseModel):
     msg: str
+
+
+class AuthRequest(BaseModel):
+    username: str
+    password: str
+
+
+class AuthResponse(BaseModel):
+    id: str
+    token: str
+    expireAt: datetime
+
+
+class MeResponse(BaseModel):
+    id: str
+    username: str
+    email: EmailStr
+    fullName: str | None = None
+    dni: str | None = None
+    phoneNumber: str | None = None
+    status: UserStatus
 
 
 @router.post("", response_model=CreateUserResponse, status_code=201)
@@ -78,3 +111,37 @@ def update_user(
     except UserNotFoundError as err:
         raise HTTPException(status_code=404, detail=str(err)) from err
     return UpdateUserResponse(msg="el usuario ha sido actualizado")
+
+
+@router.post("/auth", response_model=AuthResponse)
+def authenticate_user(
+    payload: AuthRequest,
+    use_case: BaseUseCase = Depends(build_authenticate_user_use_case),
+):
+    """Genera un nuevo token de sesión para el usuario."""
+    try:
+        user = use_case.execute(username=payload.username, password=payload.password)
+    except InvalidCredentialsError as err:
+        raise HTTPException(status_code=404, detail=str(err)) from err
+    return AuthResponse(id=user.id, token=user.token, expireAt=user.expireAt)
+
+
+@router.get("/me", response_model=MeResponse)
+def get_me(
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+    use_case: BaseUseCase = Depends(build_get_me_use_case),
+):
+    """Retorna los datos del usuario dueño del token."""
+    try:
+        user = use_case.execute(token=credentials.credentials)
+    except InvalidTokenError as err:
+        raise HTTPException(status_code=401, detail=str(err)) from err
+    return MeResponse(
+        id=user.id,
+        username=user.username,
+        email=user.email,
+        fullName=user.fullName,
+        dni=user.dni,
+        phoneNumber=user.phoneNumber,
+        status=user.status,
+    )

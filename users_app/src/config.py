@@ -55,3 +55,9 @@ class Settings:
             f"postgresql://{self.db_user}:{self.db_password}"
             f"@{self.db_host}:{self.db_port}/{self.db_name}"
         )
+
+    @classmethod
+    @property
+    @lru_cache()
+    def token_expiration_minutes(self) -> int:
+        return int(os.getenv("TOKEN_EXPIRATION_MINUTES", "60"))

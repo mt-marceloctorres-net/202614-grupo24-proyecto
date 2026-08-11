@@ -19,7 +19,12 @@ class UserRepositoryPort(ABC):
 
     @abstractmethod
     def get_by_username_or_email(self, username: str, email: str) -> Optional[User]:
-        """Obtiene un usuario por username o email (para validar unicidad y autenticación)."""
+        """Obtiene un usuario por username o email (para validar unicidad)."""
+        pass
+
+    @abstractmethod
+    def get_by_username(self, username: str) -> Optional[User]:
+        """Obtiene un usuario por su username (para autenticación)."""
         pass
 
     @abstractmethod

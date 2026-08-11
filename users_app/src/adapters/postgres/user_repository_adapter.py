@@ -74,6 +74,14 @@ class PostgresUserRepositoryAdapter(UserRepositoryPort):
             )
             return _model_to_entity(model) if model else None
 
+    def get_by_username(self, username: str) -> Optional[User]:
+        """Obtiene un usuario por su username."""
+        with self.session_factory() as session:
+            model = (
+                session.query(UserModel).filter(UserModel.username == username).first()
+            )
+            return _model_to_entity(model) if model else None
+
     def get_by_token(self, token: str) -> Optional[User]:
         """Obtiene un usuario por su token de sesión."""
         with self.session_factory() as session:
