@@ -1,6 +1,9 @@
 from adapters.postgres.route_repository_adapter import PostgresRouteRepositoryAdapter
 from domain.use_cases.base_use_case import BaseUseCase
 from domain.use_cases.create_route_use_case import CreateRouteUseCase
+from domain.use_cases.delete_route_use_case import DeleteRouteUseCase
+from domain.use_cases.get_all_routes_use_case import GetAllRoutesUseCase
+from domain.use_cases.get_route_use_case import GetRouteUseCase
 
 repository = PostgresRouteRepositoryAdapter()
 
@@ -13,3 +16,18 @@ def build_route_repository() -> PostgresRouteRepositoryAdapter:
 def build_create_route_use_case() -> BaseUseCase:
     """Build the create route use case."""
     return CreateRouteUseCase(repository)
+
+
+def build_get_all_routes_use_case() -> BaseUseCase:
+    """Build the use case for retrieving routes."""
+    return GetAllRoutesUseCase(repository)
+
+
+def build_get_route_use_case() -> BaseUseCase:
+    """Build the use case for retrieving a single route."""
+    return GetRouteUseCase(repository)
+
+
+def build_delete_route_use_case() -> BaseUseCase:
+    """Build the use case for deleting a route."""
+    return DeleteRouteUseCase(repository)

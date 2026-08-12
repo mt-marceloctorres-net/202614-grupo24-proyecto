@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from uuid import uuid4
 
 from domain.models.route import Trayecto
 from errors import InvalidRouteDatesError, RouteAlreadyExistsError
@@ -28,6 +29,6 @@ class CreateRouteUseCase:
             route.updatedAt = route.createdAt
 
         if route.id is None:
-            route.id = f"route-{route.flightId}-{route.createdAt.isoformat()}"
+            route.id = str(uuid4())
 
         return self.repository.create(route)
