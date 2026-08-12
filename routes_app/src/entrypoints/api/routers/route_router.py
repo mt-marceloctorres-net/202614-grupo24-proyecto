@@ -7,9 +7,11 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 
 from assembly import (
     build_create_route_use_case,
+    build_count_routes_use_case,
     build_delete_route_use_case,
     build_get_all_routes_use_case,
     build_get_route_use_case,
+    build_reset_routes_use_case,
 )
 from domain.models.route import Trayecto
 from domain.use_cases.base_use_case import BaseUseCase
@@ -28,6 +30,22 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 def health_check() -> str:
     """Simple health check endpoint used for the route app."""
     return "pong"
+
+
+@router.get("/count")
+def get_routes_count(
+    use_case: BaseUseCase = Depends(build_count_routes_use_case),
+) -> dict[str, int]:
+    """Return the total number of routes."""
+    return {"count": use_case.execute()}
+
+
+@router.post("/reset")
+def reset_routes(
+    use_case: BaseUseCase = Depends(build_reset_routes_use_case),
+) -> dict[str, str]:
+    """Reset the route storage and return a status message."""
+    return use_case.execute()
 
 
 @router.get("", response_model=list[Trayecto])

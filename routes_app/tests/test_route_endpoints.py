@@ -3,9 +3,11 @@ from uuid import uuid4
 import pytest
 
 from domain.models.route import Trayecto
+from domain.use_cases.count_routes_use_case import CountRoutesUseCase
 from domain.use_cases.delete_route_use_case import DeleteRouteUseCase
 from domain.use_cases.get_all_routes_use_case import GetAllRoutesUseCase
 from domain.use_cases.get_route_use_case import GetRouteUseCase
+from domain.use_cases.reset_routes_use_case import ResetRoutesUseCase
 from errors import RouteNotFoundError
 
 
@@ -30,6 +32,12 @@ class InMemoryRouteRepository:
         if route_id not in self.routes:
             raise RouteNotFoundError(f"Route with id {route_id} not found")
         return self.routes.pop(route_id)
+
+    def count(self) -> int:
+        return len(self.routes)
+
+    def reset(self) -> None:
+        self.routes.clear()
 
 
 def create_route(flight_id: str) -> Trayecto:
@@ -117,3 +125,26 @@ def test_delete_route_raises_not_found():
 
     with pytest.raises(RouteNotFoundError):
         use_case.execute(str(uuid4()))
+
+
+def test_count_routes_returns_number_of_routes():
+    repository = InMemoryRouteRepository()
+    repository.create(create_route("FL123"))
+    repository.create(create_route("FL456"))
+
+    use_case = CountRoutesUseCase(repository)
+
+    result = use_case.execute()
+
+    assert result == 2
+
+
+def test_reset_routes_clears_all_routes():
+    repository = InMemoryRouteRepository()
+    repository.create(create_route("FL123"))
+
+    use_case = ResetRoutesUseCase(repository)
+    result = use_case.execute()
+
+    assert result == {"msg": "Routes reset successfully"}
+    assert repository.count() == 0
