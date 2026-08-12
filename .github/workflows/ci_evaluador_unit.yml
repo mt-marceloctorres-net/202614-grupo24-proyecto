@@ -8,9 +8,32 @@ on:
     branches:
       - main
 jobs:
-  pets_app:
+  # pets_app queda comentado: era solo el ejemplo del curso (nunca tuvo
+  # cobertura >70%, se queda en rojo a propósito). users_app ya es la
+  # referencia real. Descomentar si en algún momento hace falta de nuevo.
+  # pets_app:
+  #   runs-on: ubuntu-latest
+  #   name: Verify pets_app
+  #   strategy:
+  #     fail-fast: true
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: 3.11
+  #     - name: Set up Poetry
+  #       uses: abatilo/actions-poetry@v3
+  #       with:
+  #         poetry-version: 2.1.1
+  #     - name: Run linter checkers in pets_app
+  #       run: make lintcheck DIR=pets_app
+  #     - name: Run unit tests
+  #       run: make unittest DIR=pets_app
+
+  users_app:
     runs-on: ubuntu-latest
-    name: Verify pets_app
+    name: Verify users_app
     strategy:
       fail-fast: true
     steps:
@@ -23,9 +46,10 @@ jobs:
         uses: abatilo/actions-poetry@v3
         with:
           poetry-version: 2.1.1
-      - name: Run linter checkers in pets_app
-        run: make lintcheck DIR=pets_app
+      - name: Run linter checkers in users_app
+        run: make lintcheck DIR=users_app
       - name: Run unit tests
+        run: make unittest DIR=users_app
         run: make unittest DIR=pets_app
 
   routes_app:
