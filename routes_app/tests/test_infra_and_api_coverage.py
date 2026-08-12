@@ -39,6 +39,7 @@ from entrypoints.api.routers.route_router import (
     health_check,
     reset_routes,
 )
+from entrypoints.api.routers.route_router import router as route_router
 from errors import InvalidRouteDatesError, RouteAlreadyExistsError, RouteNotFoundError
 
 
@@ -123,10 +124,22 @@ def test_assembly_builders_return_expected_types():
 
 
 def test_main_includes_routes_router():
-    assert any(
-        getattr(getattr(route, "original_router", None), "prefix", None) == "/routes"
-        for route in app.routes
-    )
+    paths = {getattr(route, "path", None) for route in app.routes}
+    if "/routes/ping" in paths:
+        return
+
+    included_routers = []
+    for route in app.routes:
+        original_router = getattr(route, "original_router", None)
+        if original_router is not None:
+            included_routers.append(original_router)
+
+        include_context = getattr(route, "include_context", None)
+        included_router = getattr(include_context, "included_router", None)
+        if included_router is not None:
+            included_routers.append(included_router)
+
+    assert any(candidate is route_router for candidate in included_routers)
 
 
 def test_router_functions_happy_paths():
