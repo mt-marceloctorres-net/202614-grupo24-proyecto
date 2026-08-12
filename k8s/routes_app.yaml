@@ -1,0 +1,142 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: routes-db
+  namespace: default
+  labels:
+    app: routes-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: routes-db
+  template:
+    metadata:
+      labels:
+        app: routes-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: routes_db
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: postgres
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "300m"
+              memory: "384Mi"
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: routes-db
+  namespace: default
+  labels:
+    app: routes-db
+spec:
+  type: ClusterIP
+  selector:
+    app: routes-db
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: routes-app
+  namespace: default
+  labels:
+    app: routes-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: routes-app
+  template:
+    metadata:
+      labels:
+        app: routes-app
+    spec:
+      containers:
+        - name: routes-app
+          image: routes_app:v1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DB_HOST
+              value: routes-db
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: routes_db
+            - name: DB_USER
+              value: postgres
+            - name: DB_PASSWORD
+              value: postgres
+            - name: APP_NAME
+              value: Routes app
+            - name: LOG_LEVEL
+              value: INFO
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: routes-app
+  namespace: default
+  labels:
+    app: routes-app
+spec:
+  type: NodePort
+  selector:
+    app: routes-app
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8000
+      nodePort: 30024
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: routes-db-only-from-routes-app
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: routes-db
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: routes-app
+      ports:
+        - protocol: TCP
+          port: 5432
