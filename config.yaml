@@ -28,7 +28,7 @@ offers_app:
   image_name: offers_app
   image_tag: v1.0.0
   authors:
-    - <usuario uniandes>
+    - c.caicedob
 routes_app:
   folder: routes_app
   image_name: routes_app
