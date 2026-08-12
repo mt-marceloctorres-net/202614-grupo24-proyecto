@@ -1,5 +1,3 @@
-from typing import Optional
-
 from domain.models.route import Trayecto
 
 
@@ -9,5 +7,5 @@ class GetAllRoutesUseCase:
     def __init__(self, repository):
         self.repository = repository
 
-    def execute(self, flight_id: Optional[str] = None) -> list[Trayecto]:
+    def execute(self, flight_id: str | None = None) -> list[Trayecto]:
         return self.repository.get_all(flight_id)

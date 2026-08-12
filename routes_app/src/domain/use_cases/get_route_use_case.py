@@ -1,5 +1,3 @@
-from typing import Optional
-
 from domain.models.route import Trayecto
 
 
@@ -9,5 +7,5 @@ class GetRouteUseCase:
     def __init__(self, repository):
         self.repository = repository
 
-    def execute(self, route_id: str) -> Optional[Trayecto]:
+    def execute(self, route_id: str) -> Trayecto | None:
         return self.repository.get_by_id(route_id)

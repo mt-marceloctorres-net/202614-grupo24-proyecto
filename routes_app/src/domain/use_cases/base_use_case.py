@@ -7,4 +7,3 @@ class BaseUseCase(ABC):
     @abstractmethod
     def execute(self, *args, **kwargs):
         """Execute the use case."""
-        pass

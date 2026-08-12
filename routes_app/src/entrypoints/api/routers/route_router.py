@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -6,8 +6,8 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, PlainTextResponse
 
 from assembly import (
-    build_create_route_use_case,
     build_count_routes_use_case,
+    build_create_route_use_case,
     build_delete_route_use_case,
     build_get_all_routes_use_case,
     build_get_route_use_case,
@@ -18,6 +18,13 @@ from domain.use_cases.base_use_case import BaseUseCase
 from errors import InvalidRouteDatesError, RouteAlreadyExistsError, RouteNotFoundError
 
 router = APIRouter(prefix="/routes")
+
+count_routes_use_case_dep = Depends(build_count_routes_use_case)
+reset_routes_use_case_dep = Depends(build_reset_routes_use_case)
+get_all_routes_use_case_dep = Depends(build_get_all_routes_use_case)
+get_route_use_case_dep = Depends(build_get_route_use_case)
+delete_route_use_case_dep = Depends(build_delete_route_use_case)
+create_route_use_case_dep = Depends(build_create_route_use_case)
 
 
 @router.exception_handler(RequestValidationError)
@@ -34,7 +41,7 @@ def health_check() -> str:
 
 @router.get("/count")
 def get_routes_count(
-    use_case: BaseUseCase = Depends(build_count_routes_use_case),
+    use_case: BaseUseCase = count_routes_use_case_dep,
 ) -> dict[str, int]:
     """Return the total number of routes."""
     return {"count": use_case.execute()}
@@ -42,7 +49,7 @@ def get_routes_count(
 
 @router.post("/reset")
 def reset_routes(
-    use_case: BaseUseCase = Depends(build_reset_routes_use_case),
+    use_case: BaseUseCase = reset_routes_use_case_dep,
 ) -> dict[str, str]:
     """Reset the route storage and return a status message."""
     return use_case.execute()
@@ -51,7 +58,7 @@ def reset_routes(
 @router.get("", response_model=list[Trayecto])
 def get_routes(
     flight: str | None = Query(default=None, min_length=1),
-    use_case: BaseUseCase = Depends(build_get_all_routes_use_case),
+    use_case: BaseUseCase = get_all_routes_use_case_dep,
 ) -> list[Trayecto]:
     """Return a list of routes, optionally filtered by flightId."""
     return use_case.execute(flight)
@@ -59,7 +66,7 @@ def get_routes(
 
 @router.get("/{route_id}", response_model=Trayecto)
 def get_route(
-    route_id: UUID, use_case: BaseUseCase = Depends(build_get_route_use_case)
+    route_id: UUID, use_case: BaseUseCase = get_route_use_case_dep
 ) -> Trayecto:
     """Return a route by its UUID."""
     route = use_case.execute(str(route_id))
@@ -70,7 +77,7 @@ def get_route(
 
 @router.delete("/{route_id}", response_model=Trayecto)
 def delete_route(
-    route_id: UUID, use_case: BaseUseCase = Depends(build_delete_route_use_case)
+    route_id: UUID, use_case: BaseUseCase = delete_route_use_case_dep
 ) -> Trayecto:
     """Delete a route by UUID."""
     try:
@@ -81,11 +88,11 @@ def delete_route(
 
 @router.post("", response_model=Trayecto, status_code=201)
 def create_route(
-    route: Trayecto, use_case: BaseUseCase = Depends(build_create_route_use_case)
+    route: Trayecto, use_case: BaseUseCase = create_route_use_case_dep
 ) -> Trayecto:
     """Create a new route if the data is valid and unique."""
     try:
-        route.createdAt = route.createdAt or datetime.utcnow()
+        route.createdAt = route.createdAt or datetime.now(timezone.utc)
         route.updatedAt = route.updatedAt or route.createdAt
         return use_case.execute(route)
     except RouteAlreadyExistsError as exc:

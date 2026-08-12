@@ -23,4 +23,4 @@ class Trayecto(BaseModel):
 
 Route = Trayecto
 
-__all__ = ["Trayecto", "Route"]
+__all__ = ["Route", "Trayecto"]

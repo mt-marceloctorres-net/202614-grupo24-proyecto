@@ -4,7 +4,7 @@ import pytest
 
 from domain.models.route import Trayecto
 from domain.use_cases.create_route_use_case import CreateRouteUseCase
-from errors import RouteAlreadyExistsError, InvalidRouteDatesError
+from errors import InvalidRouteDatesError, RouteAlreadyExistsError
 
 
 class FakeRepository:

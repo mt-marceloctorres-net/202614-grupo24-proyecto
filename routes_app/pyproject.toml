@@ -53,3 +53,6 @@ testpaths = [
 env = [
   "LOG_LEVEL = INFO"
 ]
+
+[tool.ruff.lint]
+ignore = ["I001"]

@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Optional
 
 from domain.models.route import Trayecto
 
@@ -12,15 +11,15 @@ class RouteRepositoryPort(ABC):
         """Persist a new route."""
 
     @abstractmethod
-    def get_by_id(self, route_id: str) -> Optional[Trayecto]:
+    def get_by_id(self, route_id: str) -> Trayecto | None:
         """Get a route by ID."""
 
     @abstractmethod
-    def get_all(self, flight_id: Optional[str] = None) -> list[Trayecto]:
+    def get_all(self, flight_id: str | None = None) -> list[Trayecto]:
         """Get all routes, optionally filtering by flight ID."""
 
     @abstractmethod
-    def get_by_flight_id(self, flight_id: str) -> Optional[Trayecto]:
+    def get_by_flight_id(self, flight_id: str) -> Trayecto | None:
         """Get a route by flight ID."""
 
     @abstractmethod

@@ -1,4 +1,3 @@
-from domain.models.route import Trayecto
 from domain.use_cases.base_use_case import BaseUseCase
 
 
