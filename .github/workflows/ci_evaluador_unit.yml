@@ -50,8 +50,6 @@ jobs:
         run: make lintcheck DIR=users_app
       - name: Run unit tests
         run: make unittest DIR=users_app
-        run: make unittest DIR=pets_app
-
   routes_app:
     runs-on: ubuntu-latest
     name: Verify routes_app
