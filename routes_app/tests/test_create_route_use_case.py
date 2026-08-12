@@ -88,3 +88,22 @@ def test_create_route_use_case_rejects_invalid_dates():
 
     with pytest.raises(InvalidRouteDatesError):
         use_case.execute(route)
+
+
+def test_create_route_use_case_rejects_past_dates():
+    repo = FakeRepository()
+    use_case = CreateRouteUseCase(repo)
+
+    route = Trayecto(
+        flightId="FL1000",
+        sourceAirportCode="BOG",
+        sourceCountry="Colombia",
+        destinyAirportCode="MEX",
+        destinyCountry="Mexico",
+        bagCost=90,
+        plannedStartDate=datetime.now(timezone.utc) - timedelta(days=2),
+        plannedEndDate=datetime.now(timezone.utc) - timedelta(days=1),
+    )
+
+    with pytest.raises(InvalidRouteDatesError):
+        use_case.execute(route)

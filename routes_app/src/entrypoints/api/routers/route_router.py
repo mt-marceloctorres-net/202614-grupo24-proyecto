@@ -27,7 +27,6 @@ delete_route_use_case_dep = Depends(build_delete_route_use_case)
 create_route_use_case_dep = Depends(build_create_route_use_case)
 
 
-@router.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """Map validation errors to HTTP 400 as required by the API contract."""
     return JSONResponse(status_code=400, content={"detail": exc.errors()})
