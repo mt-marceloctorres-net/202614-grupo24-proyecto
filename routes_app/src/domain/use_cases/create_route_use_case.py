@@ -14,14 +14,18 @@ class CreateRouteUseCase:
     def execute(self, route: Trayecto) -> Trayecto:
         """Validate and create a route."""
         if self.repository.get_by_flight_id(route.flightId) is not None:
-            raise RouteAlreadyExistsError(f"Route with flightId {route.flightId} already exists")
+            raise RouteAlreadyExistsError(
+                f"Route with flightId {route.flightId} already exists"
+            )
 
         now = datetime.now(timezone.utc)
         if route.plannedStartDate <= now or route.plannedEndDate <= now:
             raise InvalidRouteDatesError("Dates must be in the future")
 
         if route.plannedStartDate >= route.plannedEndDate:
-            raise InvalidRouteDatesError("plannedStartDate must be before plannedEndDate")
+            raise InvalidRouteDatesError(
+                "plannedStartDate must be before plannedEndDate"
+            )
 
         if route.createdAt is None:
             route.createdAt = now

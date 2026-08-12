@@ -20,7 +20,7 @@ class PostgresRouteRepositoryAdapter(RouteRepositoryPort):
     def create(self, route: Trayecto) -> Trayecto:
         now = datetime.now(timezone.utc)
         if route.id is None:
-            route.id = str(now.timestamp()).replace('.', '')
+            route.id = str(now.timestamp()).replace(".", "")
         if route.createdAt is None:
             route.createdAt = now
         if route.updatedAt is None:
