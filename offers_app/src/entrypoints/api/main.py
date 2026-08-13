@@ -1,10 +1,14 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 from adapters.postgres.database import engine
 from adapters.postgres.models import Base
 from config import settings
+from entrypoints.api.routers.offer_router import router as offer_router
 
 
 @asynccontextmanager
@@ -25,3 +29,23 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title=settings.app_name, lifespan=lifespan)
+app.include_router(offer_router)
+
+
+@app.exception_handler(RequestValidationError)
+def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """Traduce los errores de validación de Pydantic a 400.
+
+    FastAPI responde **422** por defecto cuando falta un campo o llega con otro
+    tipo. El contrato del curso exige **400** para ese mismo caso, así que sin
+    este manejador la app fallaría las pruebas del evaluador con un código que
+    parece razonable pero no es el pedido.
+
+    El detalle pasa por `jsonable_encoder` porque en Pydantic 2 la lista de
+    errores puede contener objetos que `json` no sabe serializar; sin eso, un
+    error de validación poco común se convertiría en un 500. El contrato no
+    exige cuerpo en el 400, así que el detalle es solo una ayuda para depurar.
+    """
+    return JSONResponse(
+        status_code=400, content={"detail": jsonable_encoder(exc.errors())}
+    )
