@@ -35,6 +35,9 @@ class OfferCreate(BaseModel):
     offer: float
 
 
+DESCRIPCION_MAX = 140
+
+
 class Offer(BaseModel):
     """Modelo de dominio Oferta."""
 
@@ -58,9 +61,16 @@ class Offer(BaseModel):
             La oferta lista para persistir, sin id ni fecha de creación.
 
         Raises:
-            InvalidOfferValueError: si el tamaño no es válido o la oferta es
-                negativa. El entrypoint lo traduce a 412.
+            InvalidOfferValueError: si el tamaño no es válido, la descripción
+                excede los 140 caracteres o la oferta es negativa. El entrypoint
+                lo traduce a 412.
         """
+        if len(datos.description) > DESCRIPCION_MAX:
+            raise InvalidOfferValueError(
+                f"La descripción no puede superar los {DESCRIPCION_MAX} caracteres "
+                f"(recibidos {len(datos.description)})."
+            )
+
         try:
             size = PackageSize(datos.size)
         except ValueError as exc:

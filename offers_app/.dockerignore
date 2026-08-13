@@ -1,0 +1,17 @@
+# Todo lo que no debe entrar a la imagen: agranda el build, invalida capas de
+# caché sin necesidad, y en el caso de .env metería credenciales dentro de una
+# imagen que después se publica.
+.env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+tests/
+Dockerfile
+.dockerignore
+docker-compose.yml
+README.md

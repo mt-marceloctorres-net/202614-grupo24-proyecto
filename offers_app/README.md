@@ -31,6 +31,28 @@ make lintfix   DIR=offers_app    # corrige lo que se pueda automáticamente
 make unittest  DIR=offers_app    # pytest con umbral de cobertura del 70%
 ```
 
+## Correr con Docker
+
+Levanta la app junto con su propia Postgres, desde la **raíz del repositorio**:
+
+```bash
+docker compose -f offers_app/docker-compose.yml up --build
+```
+
+La documentación interactiva queda en <http://localhost:3000/docs>. Para bajarlo
+todo y borrar los datos:
+
+```bash
+docker compose -f offers_app/docker-compose.yml down -v
+```
+
+Las credenciales de la base se leen de variables de entorno (`DB_HOST`,
+`DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`); los valores por defecto de
+`src/config.py` solo sirven para correr fuera de contenedor.
+
+`docker-compose.yml` es una comodidad de desarrollo: el evaluador no lo usa,
+despliega con los manifiestos de `/k8s` en Minikube.
+
 ## Autor
 
 Carlos Alfredo Caicedo Bermúdez — [c.caicedob@uniandes.edu.co](mailto:c.caicedob@uniandes.edu.co)

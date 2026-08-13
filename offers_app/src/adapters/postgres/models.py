@@ -23,7 +23,11 @@ class OfferModel(Base):
     id: Mapped[str] = mapped_column(String, primary_key=True)
     postId: Mapped[str] = mapped_column(String, nullable=False, index=True)
     userId: Mapped[str] = mapped_column(String, nullable=False, index=True)
-    description: Mapped[str] = mapped_column(String, nullable=False)
+    # El límite de 140 viene de `information.md`. La validación real ocurre en el
+    # dominio, que devuelve un error de contrato; esta longitud está aquí para
+    # que el esquema de la base refleje el modelo de datos documentado y como
+    # última barrera si algún día se escribe por fuera del caso de uso.
+    description: Mapped[str] = mapped_column(String(140), nullable=False)
     size: Mapped[str] = mapped_column(String, nullable=False)
     fragile: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     offer: Mapped[float] = mapped_column(Float, nullable=False)
