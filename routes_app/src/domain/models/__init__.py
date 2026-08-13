@@ -1,3 +1,3 @@
-from .route import Trayecto
+from .route import Route
 
-__all__ = ["Trayecto"]
+__all__ = ["Route"]

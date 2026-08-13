@@ -13,7 +13,7 @@ from assembly import (
     build_get_route_use_case,
     build_reset_routes_use_case,
 )
-from domain.models.route import Trayecto
+from domain.models.route import Route
 from domain.use_cases.base_use_case import BaseUseCase
 from errors import InvalidRouteDatesError, RouteAlreadyExistsError, RouteNotFoundError
 
@@ -54,19 +54,20 @@ def reset_routes(
     return use_case.execute()
 
 
-@router.get("", response_model=list[Trayecto])
+@router.get("", response_model=list[Route])
 def get_routes(
     flight: str | None = Query(default=None, min_length=1),
     use_case: BaseUseCase = get_all_routes_use_case_dep,
-) -> list[Trayecto]:
+) -> list[Route]:
     """Return a list of routes, optionally filtered by flightId."""
     return use_case.execute(flight)
 
 
-@router.get("/{route_id}", response_model=Trayecto)
+@router.get("/{route_id}", response_model=Route)
 def get_route(
-    route_id: UUID, use_case: BaseUseCase = get_route_use_case_dep
-) -> Trayecto:
+    route_id: UUID,
+    use_case: BaseUseCase = get_route_use_case_dep,
+) -> Route:
     """Return a route by its UUID."""
     route = use_case.execute(str(route_id))
     if route is None:
@@ -74,10 +75,11 @@ def get_route(
     return route
 
 
-@router.delete("/{route_id}", response_model=Trayecto)
+@router.delete("/{route_id}", response_model=Route)
 def delete_route(
-    route_id: UUID, use_case: BaseUseCase = delete_route_use_case_dep
-) -> Trayecto:
+    route_id: UUID,
+    use_case: BaseUseCase = delete_route_use_case_dep,
+) -> Route:
     """Delete a route by UUID."""
     try:
         return use_case.execute(str(route_id))
@@ -85,10 +87,11 @@ def delete_route(
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 
-@router.post("", response_model=Trayecto, status_code=201)
+@router.post("", response_model=Route, status_code=201)
 def create_route(
-    route: Trayecto, use_case: BaseUseCase = create_route_use_case_dep
-) -> Trayecto:
+    route: Route,
+    use_case: BaseUseCase = create_route_use_case_dep,
+) -> Route:
     """Create a new route if the data is valid and unique."""
     try:
         route.createdAt = route.createdAt or datetime.now(timezone.utc)

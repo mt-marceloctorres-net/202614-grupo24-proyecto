@@ -1,6 +1,6 @@
 # Routes App
 
-Aplicación de gestión de trayectos construida con FastAPI, PostgreSQL y arquitectura hexagonal (dominio, puertos, adaptadores y entrypoints).
+Aplicación de gestión de rutas construida con FastAPI, PostgreSQL y arquitectura hexagonal (dominio, puertos, adaptadores y entrypoints).
 
 ## Tabla de contenido
 
@@ -92,16 +92,16 @@ docker run --rm -p 8000:8000 \
 Prefijo base: `/routes`
 
 - `GET /routes/ping`: health check. Respuesta `pong`.
-- `GET /routes/count`: retorna el total de trayectos (`{"count": n}`).
-- `POST /routes/reset`: elimina todos los trayectos (idempotente).
-- `POST /routes`: crea un trayecto. Retorna `201`.
+- `GET /routes/count`: retorna el total de rutas (`{"count": n}`).
+- `POST /routes/reset`: elimina todas las rutas (idempotente).
+- `POST /routes`: crea una ruta. Retorna `201`.
 	- Retorna `412` para `flightId` duplicado o fechas inválidas.
 	- Retorna `400` para errores de validación del payload.
-- `GET /routes`: lista trayectos.
+- `GET /routes`: lista rutas.
 	- Soporta filtro opcional por query param `flight`.
-- `GET /routes/{route_id}`: consulta un trayecto por UUID.
+- `GET /routes/{route_id}`: consulta una ruta por UUID.
 	- Retorna `404` si no existe.
-- `DELETE /routes/{route_id}`: elimina un trayecto por UUID.
+- `DELETE /routes/{route_id}`: elimina una ruta por UUID.
 	- Retorna `404` si no existe.
 
 ## Pruebas

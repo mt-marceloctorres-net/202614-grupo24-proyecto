@@ -22,7 +22,7 @@ from assembly import (
     repository,
 )
 from config import Settings
-from domain.models.route import Trayecto
+from domain.models.route import Route
 from domain.use_cases.count_routes_use_case import CountRoutesUseCase
 from domain.use_cases.create_route_use_case import CreateRouteUseCase
 from domain.use_cases.delete_route_use_case import DeleteRouteUseCase
@@ -54,9 +54,9 @@ class DummyUseCase:
         return self.value
 
 
-def _build_route(flight_id: str = "FL123") -> Trayecto:
+def _build_route(flight_id: str = "FL123") -> Route:
     now = datetime.now(timezone.utc)
-    return Trayecto(
+    return Route(
         id=str(uuid4()),
         flightId=flight_id,
         sourceAirportCode="BOG",

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from adapters.postgres.database import SessionLocal
 from adapters.postgres.models import RouteORM
-from domain.models.route import Trayecto
+from domain.models.route import Route
 from domain.ports.route_repository_port import RouteRepositoryPort
 from errors import RouteNotFoundError
 
@@ -16,7 +16,7 @@ class PostgresRouteRepositoryAdapter(RouteRepositoryPort):
     def __init__(self, session: Session | None = None):
         self.session = session or SessionLocal()
 
-    def create(self, route: Trayecto) -> Trayecto:
+    def create(self, route: Route) -> Route:
         now = datetime.now(timezone.utc)
         if route.id is None:
             route.id = str(now.timestamp()).replace(".", "")
@@ -43,27 +43,27 @@ class PostgresRouteRepositoryAdapter(RouteRepositoryPort):
         self.session.refresh(orm_route)
         return self._to_domain(orm_route)
 
-    def get_by_id(self, route_id: str) -> Trayecto | None:
+    def get_by_id(self, route_id: str) -> Route | None:
         orm_route = self.session.get(RouteORM, route_id)
         if orm_route is None:
             return None
         return self._to_domain(orm_route)
 
-    def get_all(self, flight_id: str | None = None) -> list[Trayecto]:
+    def get_all(self, flight_id: str | None = None) -> list[Route]:
         statement = select(RouteORM)
         if flight_id is not None:
             statement = statement.where(RouteORM.flight_id == flight_id)
         orm_routes = self.session.execute(statement).scalars().all()
         return [self._to_domain(route) for route in orm_routes]
 
-    def get_by_flight_id(self, flight_id: str) -> Trayecto | None:
+    def get_by_flight_id(self, flight_id: str) -> Route | None:
         statement = select(RouteORM).where(RouteORM.flight_id == flight_id)
         orm_route = self.session.execute(statement).scalar_one_or_none()
         if orm_route is None:
             return None
         return self._to_domain(orm_route)
 
-    def delete(self, route_id: str) -> Trayecto:
+    def delete(self, route_id: str) -> Route:
         orm_route = self.session.get(RouteORM, route_id)
         if orm_route is None:
             raise RouteNotFoundError(f"Route with id {route_id} not found")
@@ -79,8 +79,8 @@ class PostgresRouteRepositoryAdapter(RouteRepositoryPort):
         self.session.commit()
 
     @staticmethod
-    def _to_domain(route: RouteORM) -> Trayecto:
-        return Trayecto(
+    def _to_domain(route: RouteORM) -> Route:
+        return Route(
             id=route.id,
             flightId=route.flight_id,
             sourceAirportCode=route.source_airport_code,

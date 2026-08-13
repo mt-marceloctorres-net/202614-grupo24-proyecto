@@ -2,7 +2,7 @@ from uuid import uuid4
 
 import pytest
 
-from domain.models.route import Trayecto
+from domain.models.route import Route
 from domain.use_cases.count_routes_use_case import CountRoutesUseCase
 from domain.use_cases.delete_route_use_case import DeleteRouteUseCase
 from domain.use_cases.get_all_routes_use_case import GetAllRoutesUseCase
@@ -15,7 +15,7 @@ class InMemoryRouteRepository:
     def __init__(self):
         self.routes = {}
 
-    def create(self, route: Trayecto) -> Trayecto:
+    def create(self, route: Route) -> Route:
         self.routes[route.id] = route
         return route
 
@@ -40,15 +40,15 @@ class InMemoryRouteRepository:
         self.routes.clear()
 
 
-def create_route(flight_id: str) -> Trayecto:
-    return Trayecto(
+def create_route(flight_id: str) -> Route:
+    return Route(
         id=str(uuid4()),
         flightId=flight_id,
         sourceAirportCode="BOG",
         sourceCountry="Colombia",
         destinyAirportCode="MEX",
         destinyCountry="Mexico",
-        bagCost=1.0,
+        bagCost=1,
         plannedStartDate="2099-01-01T00:00:00Z",
         plannedEndDate="2099-01-02T00:00:00Z",
     )

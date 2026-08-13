@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "routes_app"
 version = "1.0.0"
-description = "Aplicación de gestión de trayectos."
+description = "Aplicación de gestión de rutas."
 authors = [
   "César Forero <ca.forero10@uniandes.edu.co>"
 ]

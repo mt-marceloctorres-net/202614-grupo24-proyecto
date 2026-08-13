@@ -1,4 +1,4 @@
-from domain.models.route import Trayecto
+from domain.models.route import Route
 
 
 class GetRouteUseCase:
@@ -7,5 +7,5 @@ class GetRouteUseCase:
     def __init__(self, repository):
         self.repository = repository
 
-    def execute(self, route_id: str) -> Trayecto | None:
+    def execute(self, route_id: str) -> Route | None:
         return self.repository.get_by_id(route_id)

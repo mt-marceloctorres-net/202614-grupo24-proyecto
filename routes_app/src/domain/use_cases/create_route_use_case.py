@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from domain.models.route import Trayecto
+from domain.models.route import Route
 from errors import InvalidRouteDatesError, RouteAlreadyExistsError
 
 
@@ -11,7 +11,7 @@ class CreateRouteUseCase:
     def __init__(self, repository):
         self.repository = repository
 
-    def execute(self, route: Trayecto) -> Trayecto:
+    def execute(self, route: Route) -> Route:
         """Validate and create a route."""
         if self.repository.get_by_flight_id(route.flightId) is not None:
             raise RouteAlreadyExistsError(

@@ -1,4 +1,4 @@
-from domain.models.route import Trayecto
+from domain.models.route import Route
 
 
 class DeleteRouteUseCase:
@@ -7,5 +7,5 @@ class DeleteRouteUseCase:
     def __init__(self, repository):
         self.repository = repository
 
-    def execute(self, route_id: str) -> Trayecto:
+    def execute(self, route_id: str) -> Route:
         return self.repository.delete(route_id)
