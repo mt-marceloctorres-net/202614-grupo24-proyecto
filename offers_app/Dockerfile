@@ -24,6 +24,8 @@ COPY src/ ./src/
 # de tratarse como paquete.
 ENV PYTHONPATH=/app/src
 
-EXPOSE 3000
+# 9000 en las 4 aplicaciones, según la decisión registrada en AGENTS.md. Debe
+# coincidir con el `targetPort` del Service y el `containerPort` del Deployment.
+EXPOSE 9000
 
-CMD ["uvicorn", "entrypoints.api.main:app", "--host", "0.0.0.0", "--port", "3000"]
+CMD ["uvicorn", "entrypoints.api.main:app", "--host", "0.0.0.0", "--port", "9000"]

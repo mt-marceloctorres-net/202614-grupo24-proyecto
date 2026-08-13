@@ -39,7 +39,7 @@ Levanta la app junto con su propia Postgres, desde la **raíz del repositorio**:
 docker compose -f offers_app/docker-compose.yml up --build
 ```
 
-La documentación interactiva queda en <http://localhost:3000/docs>. Para bajarlo
+La documentación interactiva queda en <http://localhost:9000/docs>. Para bajarlo
 todo y borrar los datos:
 
 ```bash

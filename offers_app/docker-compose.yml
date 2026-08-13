@@ -5,7 +5,7 @@
 # conecta a una base real antes de pelear con Kubernetes.
 #
 #   docker compose -f offers_app/docker-compose.yml up --build
-#   http://localhost:3000/docs
+#   http://localhost:9000/docs
 services:
   offers-db:
     image: postgres:15-alpine
@@ -36,7 +36,7 @@ services:
       DB_USER: postgres
       DB_PASSWORD: postgres
     ports:
-      - "3000:3000"
+      - "9000:9000"
     depends_on:
       offers-db:
         # Sin esta condición la app arranca antes que Postgres acepte
