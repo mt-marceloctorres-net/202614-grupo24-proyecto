@@ -128,6 +128,21 @@ class OfferCreatedResponse(BaseModel):
     createdAt: datetime
 
 
+class OfferCountResponse(BaseModel):
+    """Respuesta 200 de GET /offers/count."""
+
+    count: int
+
+
+class OfferResetResponse(BaseModel):
+    """Respuesta 200 de POST /offers/reset.
+
+    El texto es literal del contrato, con mayúscula inicial y sin punto final.
+    """
+
+    msg: str = "Todos los datos fueron eliminados"
+
+
 class OfferDeletedResponse(BaseModel):
     """Respuesta 200 de DELETE /offers/{id}.
 

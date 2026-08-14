@@ -1,17 +1,22 @@
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import PlainTextResponse
 
 from assembly import (
+    build_count_offers_use_case,
     build_create_offer_use_case,
     build_delete_offer_use_case,
     build_get_offer_use_case,
     build_get_offers_use_case,
+    build_reset_offers_use_case,
 )
 from domain.models.offer import (
+    OfferCountResponse,
     OfferCreate,
     OfferCreatedResponse,
     OfferDeletedResponse,
+    OfferResetResponse,
     OfferResponse,
     es_uuid,
 )
@@ -79,12 +84,40 @@ def get_offers(
     return [OfferResponse(**oferta.model_dump()) for oferta in ofertas]
 
 
-# ⚠️ TRAMPA DE ORDEN — leer antes de agregar los endpoints técnicos (#33).
-# FastAPI resuelve las rutas en el orden en que se declaran, y `/{offer_id}`
-# captura cualquier segmento. Si `/offers/ping`, `/offers/count` o
-# `/offers/reset` se declaran DESPUÉS de esta línea, "ping" llega como si fuera
-# un identificador, falla la comprobación de uuid y el servicio responde 400 a
-# un endpoint que el evaluador espera en 200. Las rutas fijas van ARRIBA de esta.
+@router.get("/ping", response_class=PlainTextResponse)
+def ping():
+    """Confirma que el servicio está arriba.
+
+    El contrato pide el texto `pong` en **texto plano**, no un JSON. Por eso
+    `response_class=PlainTextResponse`: sin ella FastAPI serializaría la cadena
+    como `"pong"` con comillas, que es otro cuerpo.
+
+    No consulta la base de datos a propósito. Es una prueba de vida del proceso;
+    si además comprobara la base, un problema de conexión dejaría al pod
+    marcado como caído y Kubernetes lo reiniciaría en bucle sin arreglar nada.
+    """
+    return "pong"
+
+
+@router.get("/count", response_model=OfferCountResponse)
+def count_offers(use_case: BaseUseCase = Depends(build_count_offers_use_case)):
+    """Devuelve cuántas ofertas hay almacenadas."""
+    return OfferCountResponse(count=use_case.execute())
+
+
+@router.post("/reset", response_model=OfferResetResponse)
+def reset_offers(use_case: BaseUseCase = Depends(build_reset_offers_use_case)):
+    """Elimina todas las ofertas. Lo usa el evaluador antes de sus pruebas."""
+    use_case.execute()
+    return OfferResetResponse()
+
+
+# ⚠️ TRAMPA DE ORDEN — no muevas nada por debajo de esta línea hacia arriba, ni
+# al revés. FastAPI resuelve las rutas en el orden en que se declaran, y
+# `/{offer_id}` captura cualquier segmento. Si `/ping`, `/count` o `/reset` se
+# declararan DESPUÉS de aquí, "ping" llegaría como si fuera un identificador,
+# fallaría la comprobación de uuid y el servicio respondería 400 a un endpoint
+# que el evaluador espera en 200. Toda ruta fija nueva va ARRIBA de esta línea.
 @router.get("/{offer_id}", response_model=OfferResponse)
 def get_offer(
     offer_id: str,
