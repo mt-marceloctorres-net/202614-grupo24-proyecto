@@ -22,7 +22,7 @@ posts_app:
   image_name: posts_app
   image_tag: v1.0.0
   authors:
-    - <usuario uniandes>
+    - mar-torr
 offers_app:
   folder: offers_app
   image_name: offers_app
