@@ -31,6 +31,26 @@ jobs:
   #     - name: Run unit tests
   #       run: make unittest DIR=pets_app
 
+  offers_app:
+    runs-on: ubuntu-latest
+    name: Verify offers_app
+    strategy:
+      fail-fast: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - name: Set up Poetry
+        uses: abatilo/actions-poetry@v3
+        with:
+          poetry-version: 2.1.1
+      - name: Run linter checkers in offers_app
+        run: make lintcheck DIR=offers_app
+      - name: Run unit tests
+        run: make unittest DIR=offers_app
+
   users_app:
     runs-on: ubuntu-latest
     name: Verify users_app
