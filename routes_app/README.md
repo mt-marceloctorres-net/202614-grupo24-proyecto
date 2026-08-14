@@ -71,14 +71,14 @@ export DB_NAME=routes_db
 export DB_USER=postgres
 export DB_PASSWORD=postgres
 
-poetry run uvicorn src.entrypoints.api.main:app --host 0.0.0.0 --port 8000 --reload
+poetry run uvicorn src.entrypoints.api.main:app --host 0.0.0.0 --port 9000 --reload
 ```
 
 ## Ejecución con Docker
 
 ```bash
 docker build -t routes_app:v1.0.0 .
-docker run --rm -p 8000:8000 \
+docker run --rm -p 9000:9000 \
 	-e DB_HOST=host.docker.internal \
 	-e DB_PORT=5432 \
 	-e DB_NAME=routes_db \

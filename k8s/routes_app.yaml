@@ -68,7 +68,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: routes-db
+  name: routes-db-service
   namespace: default
 spec:
   type: ClusterIP
@@ -102,16 +102,16 @@ spec:
           command:
             - sh
             - -c
-            - until nc -z routes-db 5432; do echo waiting for routes-db; sleep 2; done
+            - until nc -z routes-db-service 5432; do echo waiting for routes-db; sleep 2; done
       containers:
         - name: routes-app
           image: routes_app:v1.0.0
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8000
+            - containerPort: 9000
           env:
             - name: DB_HOST
-              value: routes-db
+              value: routes-db-service
             - name: DB_PORT
               value: "5432"
             - name: DB_NAME
@@ -133,13 +133,13 @@ spec:
           readinessProbe:
             httpGet:
               path: /routes/ping
-              port: 8000
+              port: 9000
             initialDelaySeconds: 5
             periodSeconds: 5
           livenessProbe:
             httpGet:
               path: /routes/ping
-              port: 8000
+              port: 9000
             initialDelaySeconds: 10
             periodSeconds: 10
 
@@ -147,20 +147,21 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: routes-app
+  name: routes-app-service
   namespace: default
 spec:
   type: NodePort
   selector:
     app: routes-app
   ports:
-    - port: 8000
-      targetPort: 8000
+    - port: 80
+      targetPort: 9000
+      nodePort: 30002
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: routes-db-network-policy
+  name: routes-network
   namespace: default
 spec:
   podSelector:
