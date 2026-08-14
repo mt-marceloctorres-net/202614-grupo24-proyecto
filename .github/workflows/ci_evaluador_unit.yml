@@ -70,3 +70,22 @@ jobs:
         run: make lintcheck DIR=users_app
       - name: Run unit tests
         run: make unittest DIR=users_app
+  routes_app:
+    runs-on: ubuntu-latest
+    name: Verify routes_app
+    strategy:
+      fail-fast: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - name: Set up Poetry
+        uses: abatilo/actions-poetry@v3
+        with:
+          poetry-version: 2.1.1
+      - name: Run linter checkers in routes_app
+        run: make lintcheck DIR=routes_app
+      - name: Run unit tests
+        run: make unittest DIR=routes_app
