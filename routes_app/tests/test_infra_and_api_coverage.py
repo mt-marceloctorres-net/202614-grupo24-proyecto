@@ -31,6 +31,7 @@ from domain.use_cases.get_route_use_case import GetRouteUseCase
 from domain.use_cases.reset_routes_use_case import ResetRoutesUseCase
 from entrypoints.api.main import app
 from entrypoints.api.routers.route_router import (
+    RouteCreate,
     create_route,
     delete_route,
     get_route,
@@ -69,6 +70,10 @@ def _build_route(flight_id: str = "FL123") -> Route:
         createdAt=now,
         updatedAt=now,
     )
+
+
+def _build_route_create(route: Route) -> RouteCreate:
+    return RouteCreate(**route.model_dump(exclude={"id", "createdAt", "updatedAt"}))
 
 
 def _build_orm(route_id: str = "r1", flight_id: str = "FL123") -> RouteORM:
@@ -150,6 +155,8 @@ def test_router_functions_happy_paths():
     assert reset_routes(use_case=DummyUseCase({"msg": "ok"})) == {"msg": "ok"}
     assert len(get_routes("FL777", use_case=DummyUseCase([route]))) == 1
     assert get_route(uuid4(), use_case=DummyUseCase(route)).id == route.id
+    deleted = delete_route(uuid4(), use_case=DummyUseCase(route))
+    assert deleted.msg == "el trayecto fue eliminado"
 
 
 def test_router_functions_raise_http_exceptions_on_errors():
@@ -165,27 +172,24 @@ def test_router_functions_raise_http_exceptions_on_errors():
     assert delete_err.value.status_code == 404
 
     route = _build_route("FLC")
-    route.createdAt = None
-    route.updatedAt = None
-    created = create_route(route, use_case=DummyUseCase(route))
-    assert created.id is not None
-    assert created.createdAt is not None
-    assert created.updatedAt is not None
+    created = create_route(_build_route_create(route), use_case=DummyUseCase(route))
+    assert created.id == route.id
+    assert created.createdAt == route.createdAt
 
 
 def test_create_route_maps_known_business_errors_to_412():
-    route = _build_route("FL412")
+    route_in = _build_route_create(_build_route("FL412"))
 
     with pytest.raises(HTTPException) as duplicate_err:
         create_route(
-            route,
+            route_in,
             use_case=DummyUseCase(error=RouteAlreadyExistsError("duplicate")),
         )
     assert duplicate_err.value.status_code == 412
 
     with pytest.raises(HTTPException) as invalid_dates_err:
         create_route(
-            route,
+            route_in,
             use_case=DummyUseCase(error=InvalidRouteDatesError("invalid dates")),
         )
     assert invalid_dates_err.value.status_code == 412
@@ -193,7 +197,8 @@ def test_create_route_maps_known_business_errors_to_412():
 
 def test_repository_create_assigns_defaults_and_persists():
     session = MagicMock()
-    adapter = PostgresRouteRepositoryAdapter(session=session)
+    session.__enter__.return_value = session
+    adapter = PostgresRouteRepositoryAdapter(session_factory=lambda: session)
     route = _build_route("FL201")
     route.id = None
     route.createdAt = None
@@ -210,7 +215,8 @@ def test_repository_create_assigns_defaults_and_persists():
 
 def test_repository_get_by_id_and_delete_flows():
     session = MagicMock()
-    adapter = PostgresRouteRepositoryAdapter(session=session)
+    session.__enter__.return_value = session
+    adapter = PostgresRouteRepositoryAdapter(session_factory=lambda: session)
 
     orm_route = _build_orm(route_id="r-id", flight_id="FLL")
     session.get.return_value = orm_route
@@ -225,7 +231,8 @@ def test_repository_get_by_id_and_delete_flows():
 
 def test_repository_get_by_id_and_get_by_flight_id_return_none_when_missing():
     session = MagicMock()
-    adapter = PostgresRouteRepositoryAdapter(session=session)
+    session.__enter__.return_value = session
+    adapter = PostgresRouteRepositoryAdapter(session_factory=lambda: session)
 
     session.get.return_value = None
     session.execute.return_value.scalar_one_or_none.return_value = None
@@ -236,7 +243,8 @@ def test_repository_get_by_id_and_get_by_flight_id_return_none_when_missing():
 
 def test_repository_get_all_get_by_flight_count_and_reset():
     session = MagicMock()
-    adapter = PostgresRouteRepositoryAdapter(session=session)
+    session.__enter__.return_value = session
+    adapter = PostgresRouteRepositoryAdapter(session_factory=lambda: session)
 
     orm_a = _build_orm(route_id="a", flight_id="FA")
     orm_b = _build_orm(route_id="b", flight_id="FB")
@@ -263,7 +271,8 @@ def test_repository_get_all_get_by_flight_count_and_reset():
 
 def test_repository_delete_raises_when_route_not_found():
     session = MagicMock()
-    adapter = PostgresRouteRepositoryAdapter(session=session)
+    session.__enter__.return_value = session
+    adapter = PostgresRouteRepositoryAdapter(session_factory=lambda: session)
     session.get.return_value = None
 
     with pytest.raises(RouteNotFoundError):

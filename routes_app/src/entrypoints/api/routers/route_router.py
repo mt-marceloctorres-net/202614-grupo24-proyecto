@@ -1,9 +1,11 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, PlainTextResponse
+from pydantic import BaseModel, ConfigDict, Field
 
 from assembly import (
     build_count_routes_use_case,
@@ -27,9 +29,39 @@ delete_route_use_case_dep = Depends(build_delete_route_use_case)
 create_route_use_case_dep = Depends(build_create_route_use_case)
 
 
+class RouteCreate(BaseModel):
+    """Input model for POST /routes: clients cannot set id/createdAt/updatedAt."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    flightId: str = Field(..., min_length=1)
+    sourceAirportCode: str = Field(..., min_length=1)
+    sourceCountry: str = Field(..., min_length=1)
+    destinyAirportCode: str = Field(..., min_length=1)
+    destinyCountry: str = Field(..., min_length=1)
+    bagCost: int = Field(..., gt=0)
+    plannedStartDate: datetime
+    plannedEndDate: datetime
+
+
+class RouteCreateResponse(BaseModel):
+    """201 response for POST /routes, per the api_routes.md contract."""
+
+    id: str
+    createdAt: datetime
+
+
+class RouteDeletedResponse(BaseModel):
+    """200 response for DELETE /routes/{id}, per the api_routes.md contract."""
+
+    msg: str = "el trayecto fue eliminado"
+
+
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """Map validation errors to HTTP 400 as required by the API contract."""
-    return JSONResponse(status_code=400, content={"detail": exc.errors()})
+    return JSONResponse(
+        status_code=400, content={"detail": jsonable_encoder(exc.errors())}
+    )
 
 
 @router.get("/ping", response_class=PlainTextResponse)
@@ -75,28 +107,28 @@ def get_route(
     return route
 
 
-@router.delete("/{route_id}", response_model=Route)
+@router.delete("/{route_id}", response_model=RouteDeletedResponse)
 def delete_route(
     route_id: UUID,
     use_case: BaseUseCase = delete_route_use_case_dep,
-) -> Route:
+) -> RouteDeletedResponse:
     """Delete a route by UUID."""
     try:
-        return use_case.execute(str(route_id))
+        use_case.execute(str(route_id))
     except RouteNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return RouteDeletedResponse()
 
 
-@router.post("", response_model=Route, status_code=201)
+@router.post("", response_model=RouteCreateResponse, status_code=201)
 def create_route(
-    route: Route,
+    route_in: RouteCreate,
     use_case: BaseUseCase = create_route_use_case_dep,
-) -> Route:
+) -> RouteCreateResponse:
     """Create a new route if the data is valid and unique."""
     try:
-        route.createdAt = route.createdAt or datetime.now(timezone.utc)
-        route.updatedAt = route.updatedAt or route.createdAt
-        return use_case.execute(route)
+        created = use_case.execute(Route(**route_in.model_dump()))
+        return RouteCreateResponse(id=created.id, createdAt=created.createdAt)
     except RouteAlreadyExistsError as exc:
         raise HTTPException(status_code=412, detail=str(exc)) from exc
     except InvalidRouteDatesError as exc:

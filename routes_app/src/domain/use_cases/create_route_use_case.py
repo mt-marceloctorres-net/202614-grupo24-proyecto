@@ -5,6 +5,11 @@ from domain.models.route import Route
 from errors import InvalidRouteDatesError, RouteAlreadyExistsError
 
 
+def _as_aware_utc(value: datetime) -> datetime:
+    """Treat naive datetimes as UTC so they can be compared with aware ones."""
+    return value if value.tzinfo is not None else value.replace(tzinfo=timezone.utc)
+
+
 class CreateRouteUseCase:
     """Create a route with validation rules defined by the domain."""
 
@@ -19,10 +24,12 @@ class CreateRouteUseCase:
             )
 
         now = datetime.now(timezone.utc)
-        if route.plannedStartDate <= now or route.plannedEndDate <= now:
+        start = _as_aware_utc(route.plannedStartDate)
+        end = _as_aware_utc(route.plannedEndDate)
+        if start <= now or end <= now:
             raise InvalidRouteDatesError("Dates must be in the future")
 
-        if route.plannedStartDate >= route.plannedEndDate:
+        if start >= end:
             raise InvalidRouteDatesError(
                 "plannedStartDate must be before plannedEndDate"
             )
