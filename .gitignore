@@ -4,6 +4,9 @@ __pycache__/
 *$py.class
 .vscode/
 
+# Material del curso (no forma parte del código a entregar)
+/Contenido del curso/
+
 # C extensions
 *.so
 
