@@ -60,8 +60,13 @@ class RouteDeletedResponse(BaseModel):
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """Map validation errors to HTTP 400 as required by the API contract."""
     return JSONResponse(
-        status_code=400, content={"detail": jsonable_encoder(exc.errors())}
+        status_code=400, content={"msg": jsonable_encoder(exc.errors())}
     )
+
+
+async def http_exception_handler(request: Request, exc: HTTPException):
+    """Map HTTPException's default {"detail": ...} body to {"msg": ...} per the API contract."""
+    return JSONResponse(status_code=exc.status_code, content={"msg": exc.detail})
 
 
 @router.get("/ping", response_class=PlainTextResponse)

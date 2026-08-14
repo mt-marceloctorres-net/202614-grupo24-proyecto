@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 
 from adapters.postgres.database import engine
@@ -8,6 +8,7 @@ from adapters.postgres.models import BaseORM
 from config import Settings
 from entrypoints.api.routers.route_router import router as route_router
 from entrypoints.api.routers.route_router import (
+    http_exception_handler,
     validation_exception_handler,
 )
 
@@ -21,4 +22,5 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title=Settings.app_name(), lifespan=lifespan)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(HTTPException, http_exception_handler)
 app.include_router(route_router)

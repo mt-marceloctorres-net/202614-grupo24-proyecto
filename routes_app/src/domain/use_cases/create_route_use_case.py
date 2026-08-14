@@ -27,11 +27,11 @@ class CreateRouteUseCase:
         start = _as_aware_utc(route.plannedStartDate)
         end = _as_aware_utc(route.plannedEndDate)
         if start <= now or end <= now:
-            raise InvalidRouteDatesError("Dates must be in the future")
+            raise InvalidRouteDatesError("Las fechas del trayecto no son válidas")
 
         if start >= end:
             raise InvalidRouteDatesError(
-                "plannedStartDate must be before plannedEndDate"
+                "La fecha de inicio debe ser anterior a la fecha de fin"
             )
 
         if route.createdAt is None:
