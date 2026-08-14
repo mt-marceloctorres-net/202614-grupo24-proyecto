@@ -6,11 +6,9 @@ from fastapi.exceptions import RequestValidationError
 from adapters.postgres.database import engine
 from adapters.postgres.models import BaseORM
 from config import Settings
+from entrypoints.api.routers.route_router import http_exception_handler
 from entrypoints.api.routers.route_router import router as route_router
-from entrypoints.api.routers.route_router import (
-    http_exception_handler,
-    validation_exception_handler,
-)
+from entrypoints.api.routers.route_router import validation_exception_handler
 
 
 @asynccontextmanager
