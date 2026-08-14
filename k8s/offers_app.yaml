@@ -174,7 +174,7 @@ spec:
   ports:
     # Tres puertos distintos y es el error clásico confundirlos:
     #   port       80    puerto del Service dentro del clúster
-    #   targetPort 9000  donde escucha el contenedor (Dockerfile y AGENTS.md)
+    #   targetPort 9000  donde escucha el contenedor, según el Dockerfile
     #   nodePort   30003 puerto expuesto fuera, según el diagrama de despliegue
     - port: 80
       targetPort: 9000
@@ -195,7 +195,7 @@ spec:
   ingress:
     # El origen permitido debe estar en ingress[0].from[0]: el evaluador lo lee
     # por esa ruta exacta y en otra posición no lo encuentra, aunque la política
-    # funcione igual de bien en la práctica (LL-004).
+    # funcione igual de bien en la práctica.
     - from:
         - podSelector:
             matchLabels:

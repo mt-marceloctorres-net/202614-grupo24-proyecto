@@ -29,7 +29,7 @@ def cliente(repositorio):
     Estas pruebas pasan por la serialización de verdad de FastAPI, que es lo que
     las pruebas de casos de uso no tocan: si un modelo de respuesta no declara
     un campo, Pydantic lo descarta en silencio y solo se nota aquí o corriendo
-    la colección del evaluador (LL-001).
+    la colección de Postman.
 
     `TestClient` no ejecuta el `lifespan` mientras no se use como gestor de
     contexto, así que la app nunca intenta crear tablas ni conectarse a
