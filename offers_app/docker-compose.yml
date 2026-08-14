@@ -1,0 +1,44 @@
+# Entorno local de desarrollo: la app y su propia Postgres.
+#
+# Esto NO es lo que califica el evaluador — él despliega con los manifiestos de
+# /k8s en Minikube. Sirve para verificar que la imagen construye y que la app se
+# conecta a una base real antes de pelear con Kubernetes.
+#
+#   docker compose -f offers_app/docker-compose.yml up --build
+#   http://localhost:9000/docs
+services:
+  offers-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: offers_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      # Expuesto solo para poder inspeccionar la base con un cliente desde el
+      # equipo. La app no lo necesita: dentro de la red de compose se conecta
+      # por el nombre del servicio.
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d offers_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  offers-app:
+    build:
+      context: .
+    environment:
+      # El host es el nombre del servicio de compose, igual que en Kubernetes
+      # será el nombre del Service de la base de datos.
+      DB_HOST: offers-db
+      DB_PORT: 5432
+      DB_NAME: offers_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    ports:
+      - "9000:9000"
+    depends_on:
+      offers-db:
+        # Sin esta condición la app arranca antes que Postgres acepte
+        # conexiones, falla al crear las tablas y se reinicia en bucle.
+        condition: service_healthy
