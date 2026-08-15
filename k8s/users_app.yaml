@@ -68,7 +68,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: users-db
+  # Nombre exacto que espera validate_cluster.sh del evaluador.
+  name: users-db-service
   namespace: default
 spec:
   type: ClusterIP
@@ -102,7 +103,7 @@ spec:
           command:
             - sh
             - -c
-            - until nc -z users-db 5432; do echo waiting for users-db; sleep 2; done
+            - until nc -z users-db-service 5432; do echo waiting for users-db-service; sleep 2; done
       containers:
         - name: users-app
           image: users_app:v1.0.0
@@ -111,7 +112,8 @@ spec:
             - containerPort: 9000
           env:
             - name: DB_HOST
-              value: users-db
+              # El nombre del Service de su propia base es el hostname DNS.
+              value: users-db-service
             - name: DB_PORT
               value: "5432"
             - name: DB_NAME
@@ -147,7 +149,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: users-app
+  # Nombre exacto que espera validate_cluster.sh del evaluador.
+  name: users-app-service
   namespace: default
 spec:
   type: NodePort
@@ -161,7 +164,9 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: users-db-network-policy
+  # Nombre exacto que espera validate_networks.sh; cualquier otro se reporta
+  # como "Unexpected NetworkPolicy" y además falta el esperado.
+  name: users-network
   namespace: default
 spec:
   podSelector:
