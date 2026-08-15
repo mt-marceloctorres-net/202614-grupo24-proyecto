@@ -1,8 +1,14 @@
 # Posts App
 
-Microservicio de gestión de publicaciones del proyecto **Cargo tu encargo**. Construido en Python 3.11 + FastAPI, con arquitectura hexagonal (dominio / puertos / adaptadores / entrypoints) y PostgreSQL como base de datos, siguiendo el patrón de `users_app/`.
+Microservicio de gestión de publicaciones del proyecto **Cargo tu encargo**. Permite crear publicaciones de un usuario sobre un trayecto, consultarlas, filtrarlas y eliminarlas. Construido en Python 3.11 + FastAPI, con arquitectura hexagonal (dominio / puertos / adaptadores / entrypoints) y PostgreSQL como base de datos, siguiendo el patrón de `users_app/`.
 
-**Estado**: scaffold (tarjeta #23). Los endpoints de negocio (creación/consulta/eliminación de publicaciones) y los técnicos `/posts/count` y `/posts/reset` se agregan en la tarjeta #24, junto con el contrato de API confirmado. Por ahora solo expone `GET /posts/ping`.
+## Índice
+
+1. [Estructura](#estructura)
+2. [Ejecución](#ejecución)
+3. [Uso](#uso)
+4. [Pruebas](#pruebas)
+5. [Autor](#autor)
 
 ## Estructura
 
@@ -12,18 +18,18 @@ posts_app/
 ├── pyproject.toml          # Dependencias (Poetry)
 ├── src/
 │   ├── config.py           # Configuración por variables de ambiente (pydantic-settings)
-│   ├── assembly.py         # Wiring del repositorio (casos de uso llegan en #24)
+│   ├── assembly.py         # Inyección de dependencias (wiring de casos de uso)
 │   ├── errors.py           # Excepciones de dominio
 │   ├── domain/
 │   │   ├── models/         # Entidad Publicación (Pydantic)
 │   │   ├── ports/          # Interfaz PostRepositoryPort
-│   │   └── use_cases/      # Se completa en #24
+│   │   └── use_cases/      # Un caso de uso por operación
 │   ├── adapters/
 │   │   └── postgres/       # Implementación real del puerto (SQLAlchemy)
 │   └── entrypoints/
 │       └── api/            # Router de FastAPI
 └── tests/
-    └── unit/                # Pruebas de config y modelo de dominio
+    └── unit/                # Pruebas de dominio, casos de uso y router
 ```
 
 ## Ejecución
@@ -62,12 +68,43 @@ docker run -p 9000:9000 \
 
 `<host>` es el nombre del servicio de Postgres en tu `docker-compose.yml`/red de Docker, o el Service `posts-db-service` en Kubernetes — nunca `localhost` fijo.
 
+### En Kubernetes (Minikube)
+
+```bash
+minikube image load posts_app:v1.0.0
+kubectl apply -f ../k8s/posts_app.yaml
+```
+
+Despliega `posts-app` (Service `posts-app-service`) + `posts-db` (Service `posts-db-service`), con aislamiento de red mediante la `NetworkPolicy` `posts-network`: solo `posts-app` puede conectarse a `posts-db`.
+
+El aislamiento se probó manualmente en un clúster real de Minikube con CNI Calico (`minikube start --cni=calico`) y quedó confirmado: pods `1/1 Running` y la política bloqueando el tráfico no autorizado. Sin un CNI que soporte `NetworkPolicy` (el driver por defecto de Minikube no lo soporta), estas políticas se aceptan pero no se aplican — vale la pena tenerlo presente antes de repetir la validación.
+
+## Uso
+
+API REST bajo el prefijo `/posts`, contra el contrato oficial (`api_posts.md` del curso):
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| POST | `/posts` | Crea una publicación |
+| GET | `/posts` | Ve y filtra publicaciones (`expire`, `route`, `owner`, todos opcionales) |
+| GET | `/posts/{id}` | Consulta una publicación |
+| DELETE | `/posts/{id}` | Elimina una publicación |
+| GET | `/posts/count` | Cuenta las publicaciones almacenadas |
+| GET | `/posts/ping` | Healthcheck |
+| POST | `/posts/reset` | Elimina todas las publicaciones |
+
+`posts_app` no valida que `routeId`/`userId` existan en `routes_app`/`users_app`: es una decisión deliberada del equipo (documentada en `AGENTS.md`), no una omisión. La creación de una publicación devuelve `412` con el cuerpo `{"msg": "La fecha expiración no es válida"}` si `expireAt` no es una fecha futura.
+
+Para probar el API completo, importa en Postman la colección oficial `entrega1_posts.json` y apunta la variable de entorno correspondiente a tu instancia.
+
 ## Pruebas
 
 ```bash
 poetry install
 poetry run pytest --cov=src -v -s --cov-report term-missing
 ```
+
+39 pruebas unitarias (modelo de dominio, configuración, 6 casos de uso con un repositorio falso en memoria, y router con `TestClient` y `dependency_overrides` — sin necesitar Postgres real), cobertura actual **76.71%**. Se ejecutan automáticamente en el pipeline `ci_evaluador_unit.yml` (job `posts_app`) en cada push/PR a `main`.
 
 ## Autor
 
