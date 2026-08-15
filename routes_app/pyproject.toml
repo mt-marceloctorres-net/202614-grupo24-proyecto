@@ -3,7 +3,7 @@ name = "routes_app"
 version = "1.0.0"
 description = "Aplicación de gestión de rutas."
 authors = [
-  "César Forero <ca.forero10@uniandes.edu.co>"
+  "Marcelo César Torres Ortiz <mc.torreso1@uniandes.edu.co>"
 ]
 license = "MIT"
 readme = "README.md"
@@ -41,7 +41,7 @@ profile = "black"
 multi_line_output = 3
 
 [tool.bandit]
-exclude_dirs = ["./tests"]
+exclude_dirs = ["./tests", ".venv"]
 skips = ["B101"]
 
 [tool.pytest.ini_options]
