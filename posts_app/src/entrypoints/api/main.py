@@ -8,6 +8,7 @@ from adapters.postgres.database import engine
 from adapters.postgres.models import Base
 from config import settings
 from entrypoints.api.routers.post_router import router as post_router
+from errors import InvalidExpirationError
 
 
 @asynccontextmanager
@@ -30,3 +31,9 @@ app.include_router(post_router)
 def validation_exception_handler(request: Request, exc: RequestValidationError):
     """El contrato del curso exige 400 para errores de validación, no el 422 por defecto de FastAPI."""
     return JSONResponse(status_code=400, content={"detail": exc.errors()})
+
+
+@app.exception_handler(InvalidExpirationError)
+def invalid_expiration_exception_handler(request: Request, exc: InvalidExpirationError):
+    """El contrato de api_posts.md exige el cuerpo exacto {"msg": "..."} en el 412."""
+    return JSONResponse(status_code=412, content={"msg": str(exc)})
