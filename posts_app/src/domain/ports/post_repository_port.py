@@ -5,14 +5,7 @@ from domain.models.post import Post
 
 
 class PostRepositoryPort(ABC):
-    """Interfaz del repositorio de publicaciones.
-
-    Cubre solo las operaciones que ya son seguras de anticipar en el scaffold
-    (creación, consulta por id, y los endpoints técnicos /count y /reset).
-    Los casos de uso de negocio (consulta filtrada, eliminación, etc.) y
-    cualquier método adicional que el contrato de API requiera se agregan en
-    la tarjeta #24, junto con el contrato confirmado.
-    """
+    """Interfaz del repositorio de publicaciones."""
 
     @abstractmethod
     def create(self, post: Post) -> Post:
@@ -22,6 +15,21 @@ class PostRepositoryPort(ABC):
     @abstractmethod
     def get_by_id(self, post_id: str) -> Optional[Post]:
         """Obtiene una publicación por su id."""
+        pass
+
+    @abstractmethod
+    def list(
+        self,
+        expire: Optional[bool] = None,
+        route_id: Optional[str] = None,
+        owner_id: Optional[str] = None,
+    ) -> list[Post]:
+        """Lista publicaciones, filtrando (AND) por expiración/trayecto/dueño."""
+        pass
+
+    @abstractmethod
+    def delete(self, post_id: str) -> bool:
+        """Elimina una publicación por id. Retorna False si no existía."""
         pass
 
     @abstractmethod
