@@ -6,15 +6,16 @@ from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel
 
 from assembly import (
+    build_count_posts_use_case,
     build_create_post_use_case,
     build_delete_post_use_case,
     build_get_post_use_case,
     build_list_posts_use_case,
+    build_reset_posts_use_case,
 )
 from domain.use_cases.base_use_case import BaseUseCase
 from errors import PostNotFoundError
 
-# Los endpoints técnicos /posts/count y /posts/reset se agregan en #26.
 router = APIRouter(prefix="/posts")
 
 
@@ -49,6 +50,14 @@ class PostResponse(BaseModel):
 
 
 class DeletePostResponse(BaseModel):
+    msg: str
+
+
+class CountResponse(BaseModel):
+    count: int
+
+
+class ResetResponse(BaseModel):
     msg: str
 
 
@@ -93,8 +102,22 @@ def health_check():
     return "pong"
 
 
-# Las rutas con {post_id} van después de /ping a propósito: si quedaran antes,
-# "ping" se interpretaría como un post_id y nunca llegaría al healthcheck.
+@router.get("/count", response_model=CountResponse)
+def count_posts(use_case: BaseUseCase = Depends(build_count_posts_use_case)):
+    """Cuenta cuántas publicaciones hay almacenadas."""
+    return CountResponse(count=use_case.execute())
+
+
+@router.post("/reset", response_model=ResetResponse)
+def reset_posts(use_case: BaseUseCase = Depends(build_reset_posts_use_case)):
+    """Elimina todas las publicaciones."""
+    use_case.execute()
+    return ResetResponse(msg="Todos los datos fueron eliminados")
+
+
+# Las rutas con {post_id} van al final a propósito: si quedaran antes de
+# /ping, /count o /reset, esos nombres se interpretarían como un post_id y
+# nunca llegarían a su endpoint real.
 @router.get("/{post_id}", response_model=PostResponse)
 def get_post(
     post_id: str,
