@@ -94,15 +94,17 @@ Prefijo base: `/routes`
 - `GET /routes/ping`: health check. Respuesta `pong`.
 - `GET /routes/count`: retorna el total de rutas (`{"count": n}`).
 - `POST /routes/reset`: elimina todas las rutas (idempotente).
-- `POST /routes`: crea una ruta. Retorna `201`.
+- `POST /routes`: crea una ruta. Retorna `201` con **solo** `{"id": "...", "createdAt": "..."}` (no la ruta completa).
 	- Retorna `412` para `flightId` duplicado o fechas inválidas.
 	- Retorna `400` para errores de validación del payload.
 - `GET /routes`: lista rutas.
 	- Soporta filtro opcional por query param `flight`.
 - `GET /routes/{route_id}`: consulta una ruta por UUID.
 	- Retorna `404` si no existe.
-- `DELETE /routes/{route_id}`: elimina una ruta por UUID.
+- `DELETE /routes/{route_id}`: elimina una ruta por UUID. Retorna `200` con `{"msg": "el trayecto fue eliminado"}`.
 	- Retorna `404` si no existe.
+
+Todos los cuerpos de error (`400`, `404`, `412`) van bajo la clave `"msg"`, ej. `{"msg": "Las fechas del trayecto no son válidas"}`.
 
 ## Pruebas
 
@@ -121,4 +123,4 @@ make unittest DIR=routes_app
 ## Autores
 
 - Equipo Cargo tu encargo
-- César Forero
+- Marcelo César Torres Ortiz (mc.torreso1)
