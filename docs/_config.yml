@@ -1,0 +1,17 @@
+title: Cargo tu encargo
+description: Documentación técnica del proyecto — Grupo 24, MISW-4301.
+remote_theme: just-the-docs/just-the-docs@v0.10.1
+
+url: https://just-the-docs.github.io
+enable_copy_code_button: true
+
+callouts:
+  warning:
+    title: ATENCIÓN
+    color: yellow
+  note:
+    title: NOTA
+    color: blue
+  alert:
+    title: ALERTA
+    color: red

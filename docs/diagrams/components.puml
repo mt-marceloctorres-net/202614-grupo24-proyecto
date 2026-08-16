@@ -1,0 +1,43 @@
+@startuml components
+
+title Vista funcional — Componentes (Entrega 1)
+skinparam componentStyle rectangle
+
+actor "Cliente\n(Postman / App)" as client
+
+component "users_app" as users_app {
+  interface "REST /users" as users_api
+}
+component "posts_app" as posts_app {
+  interface "REST /posts" as posts_api
+}
+component "offers_app" as offers_app {
+  interface "REST /offers" as offers_api
+}
+component "routes_app" as routes_app {
+  interface "REST /routes" as routes_api
+}
+
+database "users_db" as users_db
+database "posts_db" as posts_db
+database "offers_db" as offers_db
+database "routes_db" as routes_db
+
+client --> users_api
+client --> posts_api
+client --> offers_api
+client --> routes_api
+
+users_app  --> users_db
+posts_app  --> posts_db
+offers_app --> offers_db
+routes_app --> routes_db
+
+note bottom of routes_app
+  En la primera entrega las cuatro aplicaciones están
+  completamente desacopladas: no hay llamadas entre
+  componentes. Cada uno es dueño exclusivo de su base
+  de datos (restricción de cohesión del enunciado).
+end note
+
+@enduml
