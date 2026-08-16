@@ -39,8 +39,8 @@ entity "routes" as routes {
 entity "posts" as posts {
   * id : string <<uuid>>
   --
-  routeId : string <<fk: routes.id>>
-  userId : string <<fk: users.id>>
+  routeId : string <<ref: routes.id>>
+  userId : string <<ref: users.id>>
   expireAt : datetime
   createdAt : datetime
 }
@@ -48,8 +48,8 @@ entity "posts" as posts {
 entity "offers" as offers {
   * id : string <<uuid>>
   --
-  postId : string <<fk: posts.id>>
-  userId : string <<fk: users.id>>
+  postId : string <<ref: posts.id>>
+  userId : string <<ref: users.id>>
   description : string [max 140]
   size : string <<LARGE|MEDIUM|SMALL>>
   fragile : bool
