@@ -48,10 +48,11 @@ class CreatePostRequest(BaseModel):
         `userId`/`routeId` con valores como `"invalidId"` y espera **400** —
         sin esto, `posts_app` respondía 201 y los registros basura además
         rompían las pruebas de listado/conteo que corren después (contaban
-        publicaciones de más). No confundir con la regla de "no validar
-        existencia" de `AGENTS.md`: esto solo valida forma, nunca consulta
-        `routes_app`/`users_app`. Se acepta cualquier versión de uuid, igual
-        que en `offers_app` — los identificadores del curso son uuid v1.
+        publicaciones de más). No confundir con la decisión de no validar
+        que `routeId`/`userId` existan (ver `domain/models/post.py`): esto
+        solo valida forma, nunca consulta `routes_app`/`users_app`. Se
+        acepta cualquier versión de uuid, igual que en `offers_app` — los
+        identificadores del curso son uuid v1.
         """
         if not _es_uuid(valor):
             raise ValueError("debe tener formato uuid")

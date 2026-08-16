@@ -1,12 +1,9 @@
 from datetime import datetime
 
 import pytest
-from fastapi import FastAPI, Request
-from fastapi.encoders import jsonable_encoder
-from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
 from fastapi.testclient import TestClient
 
+from entrypoints.api.main import app as real_app
 from entrypoints.api.routers import post_router as post_router_module
 from errors import InvalidExpirationError, PostNotFoundError
 
@@ -23,30 +20,23 @@ class FakeUseCase:
 
 @pytest.fixture
 def app():
-    """FastAPI aislado con solo el router de posts.
+    """La app real de `entrypoints/api/main.py`, no una copia.
 
-    Registra los mismos exception handlers que `entrypoints/api/main.py`
-    (RequestValidationError -> 400, InvalidExpirationError -> 412): esos
-    handlers viven a nivel de app, no de router, así que hay que
-    replicarlos aquí para poder observar el comportamiento real del
-    contrato a través del `TestClient`.
+    Usar la app real (en vez de construir una `FastAPI()` aparte y
+    duplicar a mano sus `exception_handler`) evita que las pruebas queden
+    validando una copia que puede desalinearse del código real — pasó una
+    vez con el manejador de `RequestValidationError` (ver `main.py`) y no
+    se detectó hasta correr el pipeline oficial.
+
+    `TestClient` **sin usarse como context manager** (`with ... as client`)
+    no dispara el `lifespan` de FastAPI, así que `Base.metadata.create_all`
+    nunca se ejecuta aquí — la prueba sigue sin necesitar Postgres real.
+    Se limpian los `dependency_overrides` al final porque `real_app` es un
+    singleton compartido entre pruebas, a diferencia de una app nueva por
+    prueba.
     """
-    fastapi_app = FastAPI()
-    fastapi_app.include_router(post_router_module.router)
-
-    @fastapi_app.exception_handler(RequestValidationError)
-    def validation_exception_handler(request: Request, exc: RequestValidationError):
-        return JSONResponse(
-            status_code=400, content={"detail": jsonable_encoder(exc.errors())}
-        )
-
-    @fastapi_app.exception_handler(InvalidExpirationError)
-    def invalid_expiration_exception_handler(
-        request: Request, exc: InvalidExpirationError
-    ):
-        return JSONResponse(status_code=412, content={"msg": str(exc)})
-
-    return fastapi_app
+    yield real_app
+    real_app.dependency_overrides.clear()
 
 
 @pytest.fixture

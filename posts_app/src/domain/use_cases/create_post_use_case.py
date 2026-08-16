@@ -17,8 +17,9 @@ class CreatePostUseCase(BaseUseCase):
         """Crea una publicación, validando que `expireAt` sea futura.
 
         No valida que `routeId`/`userId` existan en `routes_app`/`users_app`:
-        es una decisión deliberada del equipo (ver AGENTS.md, "Decisiones
-        contraintuitivas").
+        es una decisión deliberada, no un descuido — ver `domain/models/post.py`
+        para el porqué (el contrato no lo exige y la colección oficial de
+        pruebas no lo comprueba).
         """
         if expireAt.tzinfo is not None:
             expireAt = expireAt.astimezone(timezone.utc).replace(tzinfo=None)

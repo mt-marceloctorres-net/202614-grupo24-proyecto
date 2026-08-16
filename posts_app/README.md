@@ -93,7 +93,7 @@ API REST bajo el prefijo `/posts`, contra el contrato oficial (`api_posts.md` de
 | GET | `/posts/ping` | Healthcheck |
 | POST | `/posts/reset` | Elimina todas las publicaciones |
 
-`posts_app` no valida que `routeId`/`userId` existan en `routes_app`/`users_app`: es una decisión deliberada del equipo (documentada en `AGENTS.md`), no una omisión. La creación de una publicación devuelve `412` con el cuerpo `{"msg": "La fecha expiración no es válida"}` si `expireAt` no es una fecha futura.
+`posts_app` no valida que `routeId`/`userId` existan en `routes_app`/`users_app`: es una decisión deliberada, no una omisión — el contrato `api_posts.md` no la exige y la colección oficial de pruebas (`entrega1_posts.json`) tampoco la comprueba. Sí se valida que ambos tengan **formato** uuid (400 si no), aunque no se compruebe que existan. La creación de una publicación devuelve `412` con el cuerpo `{"msg": "La fecha expiración no es válida"}` si `expireAt` no es una fecha futura.
 
 Para probar el API completo, importa en Postman la colección oficial `entrega1_posts.json` y apunta la variable de entorno correspondiente a tu instancia.
 
