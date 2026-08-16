@@ -47,8 +47,8 @@ Este proyecto implementa el sistema en cuatro aplicaciones independientes (usuar
 
 - **GitHub**: [@mc-torreso1-uniandes-edu-co](https://github.com/mc-torreso1-uniandes-edu-co)
 - **Correo Uniandes**: `mc.torreso1@uniandes.edu.co`
-- **Rol actual**: _[Marcelo completa esto]_
-- **Intereses en ingeniería de software**: _[Marcelo completa esto]_
+- **Rol actual**: Ingeniero Civil de la Universidad Católica de Colombia, Especialista en Sistemas de Información Geográfica de la Universidad Antonio Nariño, Estudiante de la Maestría en Inteligencia Artificial de la Universidad de los Andes, con experiencia en desarrollo de software y análisis de datos. Arquitecto de Soluciones Geográficas en el área de Servicios Profesionales de Esri Colombia, Ecuador y Panamá, distribuidor exclusivo del software ArcGIS para los tres países. Participación en proyectos de desarrollo de software y análisis de datos para clientes del sector público y privado, incluyendo entidades gubernamentales, empresas de telecomunicaciones y organizaciones sin ánimo de lucro. 
+- **Intereses en ingeniería de software**: Experiencia que incluye el diseño e implementación de soluciones geoespaciales, análisis de datos geográficos y desarrollo de aplicaciones web, móviles y de escritorio. Participación en proyectos de investigación relacionados con la inteligencia artificial y el aprendizaje automático aplicados a problemas geoespaciales. Apasionado por la tecnología y su aplicación para resolver problemas del mundo real, y comprometido con el aprendizaje continuo y la mejora constante en la carrera profesional. Especificamente, interés en el desarrollo de aplicaciones nativas en la nube para brindar asesoría a los clientes en la implementación de soluciones geoespaciales y análisis de datos geográficos en la nube.
 
 ### Reglas de equipo
 
