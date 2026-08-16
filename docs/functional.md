@@ -22,6 +22,6 @@ Diagrama fuente: [`diagrams/components.puml`](./diagrams/components.puml).
 ## Cohesión y acoplamiento
 
 - Cada aplicación es dueña exclusiva de su información: ninguna accede directamente a la base de datos de otra.
-- En esta entrega las cuatro aplicaciones están **completamente desacopladas** — no hay llamadas entre componentes. Por ejemplo, `posts_app` no valida contra `routes_app`/`users_app` que el `routeId`/`userId` recibido exista; solo valida formato.
+- En esta entrega las cuatro aplicaciones están **completamente desacopladas**: no hay llamadas entre componentes. Por ejemplo, `posts_app` no valida contra `routes_app`/`users_app` que el `routeId`/`userId` recibido exista; solo valida formato.
 - Todas exponen los mismos endpoints técnicos por contrato: `GET /ping` (salud) y `POST /reset` (limpieza de datos), usados por los pipelines de evaluación.
-- Todas comparten arquitectura hexagonal (dominio / puertos / adaptadores / entrypoints), Python 3.11 + FastAPI, y PostgreSQL como motor de base de datos — ver la [vista de desarrollo](./development.md) para el detalle de tecnologías.
+- Todas comparten arquitectura hexagonal (dominio / puertos / adaptadores / entrypoints), Python 3.11 + FastAPI, y PostgreSQL como motor de base de datos. Ver la [vista de desarrollo](./development.md) para el detalle de tecnologías.

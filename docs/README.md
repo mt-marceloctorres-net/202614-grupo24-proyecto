@@ -8,7 +8,7 @@ nav_order: 1
 
 Cargo tu encargo conecta a personas que necesitan enviar un paquete con viajeros que ya tienen planeado un trayecto y les sobra espacio de equipaje. Un usuario publica una oferta de envío sobre un trayecto existente, y otro usuario con espacio disponible responde con una oferta de transporte.
 
-Este proyecto implementa el sistema en cuatro aplicaciones independientes — usuarios, trayectos, publicaciones y ofertas — cada una dueña de su propia base de datos, desplegadas como contenedores independientes sobre Kubernetes.
+Este proyecto implementa el sistema en cuatro aplicaciones independientes (usuarios, trayectos, publicaciones y ofertas), cada una dueña de su propia base de datos, desplegadas como contenedores independientes sobre Kubernetes.
 
 ## Equipo
 
@@ -17,10 +17,10 @@ Este proyecto implementa el sistema en cuatro aplicaciones independientes — us
 
 | Integrante | Usuario Uniandes | Aplicación a cargo |
 |---|---|---|
-| Carlos Alfredo Caicedo Bermudez | `c.caicedob` | `offers_app` — gestión de ofertas |
-| Omar Fernando Muñoz | `of.munoz` | `users_app` — gestión de usuarios |
-| Marco Tulio Torres Meneses | `mar-torr` | `posts_app` — gestión de publicaciones |
-| Marcelo Cesar Torres Ortiz | `mc.torreso1` | `routes_app` — gestión de trayectos |
+| Carlos Alfredo Caicedo Bermudez | `c.caicedob` | `offers_app`: gestión de ofertas |
+| Omar Fernando Muñoz | `of.munoz` | `users_app`: gestión de usuarios |
+| Marco Tulio Torres Meneses | `mar-torr` | `posts_app`: gestión de publicaciones |
+| Marcelo Cesar Torres Ortiz | `mc.torreso1` | `routes_app`: gestión de trayectos |
 
 ### Carlos Alfredo Caicedo Bermudez
 
