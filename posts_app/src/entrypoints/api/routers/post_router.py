@@ -3,7 +3,7 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import PlainTextResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 from assembly import (
     build_count_posts_use_case,
@@ -19,20 +19,43 @@ from errors import PostNotFoundError
 router = APIRouter(prefix="/posts")
 
 
+def _es_uuid(valor: str) -> bool:
+    """Indica si el texto tiene formato uuid, de cualquier versión."""
+    try:
+        uuid.UUID(valor)
+    except (AttributeError, TypeError, ValueError):
+        return False
+    return True
+
+
 def _validate_uuid_format(post_id: str) -> None:
     """El contrato exige 400 si el id no tiene formato uuid (no si no existe)."""
-    try:
-        uuid.UUID(post_id)
-    except ValueError as err:
-        raise HTTPException(
-            status_code=400, detail="El id no tiene formato uuid"
-        ) from err
+    if not _es_uuid(post_id):
+        raise HTTPException(status_code=400, detail="El id no tiene formato uuid")
 
 
 class CreatePostRequest(BaseModel):
     routeId: str
     expireAt: datetime
     userId: str
+
+    @field_validator("routeId", "userId")
+    @classmethod
+    def _validar_formato_uuid(cls, valor: str) -> str:
+        """Exige formato uuid en routeId/userId, sin validar que existan.
+
+        La colección oficial del evaluador (`entrega1_posts.json`) manda
+        `userId`/`routeId` con valores como `"invalidId"` y espera **400** —
+        sin esto, `posts_app` respondía 201 y los registros basura además
+        rompían las pruebas de listado/conteo que corren después (contaban
+        publicaciones de más). No confundir con la regla de "no validar
+        existencia" de `AGENTS.md`: esto solo valida forma, nunca consulta
+        `routes_app`/`users_app`. Se acepta cualquier versión de uuid, igual
+        que en `offers_app` — los identificadores del curso son uuid v1.
+        """
+        if not _es_uuid(valor):
+            raise ValueError("debe tener formato uuid")
+        return valor
 
 
 class CreatePostResponse(BaseModel):

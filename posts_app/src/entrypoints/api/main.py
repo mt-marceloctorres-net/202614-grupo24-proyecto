@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
@@ -29,8 +30,16 @@ app.include_router(post_router)
 
 @app.exception_handler(RequestValidationError)
 def validation_exception_handler(request: Request, exc: RequestValidationError):
-    """El contrato del curso exige 400 para errores de validación, no el 422 por defecto de FastAPI."""
-    return JSONResponse(status_code=400, content={"detail": exc.errors()})
+    """El contrato del curso exige 400 para errores de validación, no el 422 por defecto de FastAPI.
+
+    El detalle pasa por `jsonable_encoder` porque en Pydantic 2 la lista de
+    errores puede contener objetos (como una excepción `ValueError` cruda de
+    un `field_validator`) que `json.dumps` no sabe serializar; sin esto, un
+    error de validación se convertiría en un 500 en vez de un 400.
+    """
+    return JSONResponse(
+        status_code=400, content={"detail": jsonable_encoder(exc.errors())}
+    )
 
 
 @app.exception_handler(InvalidExpirationError)

@@ -2,6 +2,7 @@ from datetime import datetime
 
 import pytest
 from fastapi import FastAPI, Request
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.testclient import TestClient
@@ -35,7 +36,9 @@ def app():
 
     @fastapi_app.exception_handler(RequestValidationError)
     def validation_exception_handler(request: Request, exc: RequestValidationError):
-        return JSONResponse(status_code=400, content={"detail": exc.errors()})
+        return JSONResponse(
+            status_code=400, content={"detail": jsonable_encoder(exc.errors())}
+        )
 
     @fastapi_app.exception_handler(InvalidExpirationError)
     def invalid_expiration_exception_handler(
@@ -105,6 +108,22 @@ def test_create_post_missing_field(client):
     incomplete_body = {"routeId": VALID_BODY["routeId"], "userId": VALID_BODY["userId"]}
 
     response = client.post("/posts", json=incomplete_body)
+
+    assert response.status_code == 400
+
+
+def test_create_post_invalid_route_id_format(client):
+    body = {**VALID_BODY, "routeId": "invalidId"}
+
+    response = client.post("/posts", json=body)
+
+    assert response.status_code == 400
+
+
+def test_create_post_invalid_user_id_format(client):
+    body = {**VALID_BODY, "userId": "invalidId"}
+
+    response = client.post("/posts", json=body)
 
     assert response.status_code == 400
 
