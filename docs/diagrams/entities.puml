@@ -1,0 +1,72 @@
+@startuml entities
+
+title Vista de información — Entidades (Entrega 1)
+hide circle
+skinparam linetype ortho
+
+entity "users" as users {
+  * id : string <<uuid>>
+  --
+  username : string
+  email : string
+  phoneNumber : string [opcional]
+  dni : string [opcional]
+  fullName : string [opcional]
+  password : string
+  salt : string
+  token : string
+  status : string <<POR_VERIFICAR|NO_VERIFICADO|VERIFICADO>>
+  expireAt : datetime
+  createdAt : datetime
+  updatedAt : datetime
+}
+
+entity "routes" as routes {
+  * id : string <<uuid>>
+  --
+  flightId : string <<unique>>
+  sourceAirportCode : string
+  sourceCountry : string
+  destinyAirportCode : string
+  destinyCountry : string
+  bagCost : int
+  plannedStartDate : datetime
+  plannedEndDate : datetime
+  createdAt : datetime
+  updatedAt : datetime
+}
+
+entity "posts" as posts {
+  * id : string <<uuid>>
+  --
+  routeId : string <<ref: routes.id>>
+  userId : string <<ref: users.id>>
+  expireAt : datetime
+  createdAt : datetime
+}
+
+entity "offers" as offers {
+  * id : string <<uuid>>
+  --
+  postId : string <<ref: posts.id>>
+  userId : string <<ref: users.id>>
+  description : string [max 140]
+  size : string <<LARGE|MEDIUM|SMALL>>
+  fragile : bool
+  offer : float
+  createdAt : datetime
+}
+
+routes ||--o{ posts : routeId
+users  ||--o{ posts : userId
+posts  ||--o{ offers : postId
+users  ||--o{ offers : userId
+
+note bottom of offers
+  Las relaciones son lógicas, no llaves foráneas
+  en base de datos: cada entidad vive en su propia
+  base de datos, propiedad exclusiva de su aplicación.
+  La entidad Score queda fuera del alcance de esta entrega.
+end note
+
+@enduml

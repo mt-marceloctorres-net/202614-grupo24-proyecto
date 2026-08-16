@@ -1,0 +1,84 @@
+@startuml deployment
+
+title Vista de despliegue — Modelo de despliegue (Entrega 1, Minikube)
+left to right direction
+skinparam componentStyle rectangle
+
+actor "Cliente\n(Postman)" as client
+
+node "Minikube — namespace: default" {
+
+  frame "users-app" as users_app_dep {
+    hexagon "users_app" as users_app_img
+  }
+  component "users-app-service" as users_app_svc
+  frame "users-db" as users_db_dep {
+    database "users_db" as users_db_img
+  }
+  component "users-db-service" as users_db_svc
+  artifact "users-db-volumen" as users_db_vol
+
+  frame "posts-app" as posts_app_dep {
+    hexagon "posts_app" as posts_app_img
+  }
+  component "posts-app-service" as posts_app_svc
+  frame "posts-db" as posts_db_dep {
+    database "posts_db" as posts_db_img
+  }
+  component "posts-db-service" as posts_db_svc
+  artifact "posts-db-volumen" as posts_db_vol
+
+  frame "offers-app" as offers_app_dep {
+    hexagon "offers_app" as offers_app_img
+  }
+  component "offers-app-service" as offers_app_svc
+  frame "offers-db" as offers_db_dep {
+    database "offers_db" as offers_db_img
+  }
+  component "offers-db-service" as offers_db_svc
+  artifact "offers-db-volumen" as offers_db_vol
+
+  frame "routes-app" as routes_app_dep {
+    hexagon "routes_app" as routes_app_img
+  }
+  component "routes-app-service" as routes_app_svc
+  frame "routes-db" as routes_db_dep {
+    database "routes_db" as routes_db_img
+  }
+  component "routes-db-service" as routes_db_svc
+  artifact "routes-db-volumen" as routes_db_vol
+}
+
+client --> users_app_svc : NodePort
+client --> posts_app_svc : NodePort
+client --> offers_app_svc : NodePort
+client --> routes_app_svc : NodePort
+
+users_app_dep  -down-> users_app_svc
+posts_app_dep  -down-> posts_app_svc
+offers_app_dep -down-> offers_app_svc
+routes_app_dep -down-> routes_app_svc
+
+users_app_svc  ..> users_db_svc  : "5432 (ClusterIP)"
+posts_app_svc  ..> posts_db_svc  : "5432 (ClusterIP)"
+offers_app_svc ..> offers_db_svc : "5432 (ClusterIP)"
+routes_app_svc ..> routes_db_svc : "5432 (ClusterIP)"
+
+users_db_dep  -down-> users_db_svc
+posts_db_dep  -down-> posts_db_svc
+offers_db_dep -down-> offers_db_svc
+routes_db_dep -down-> routes_db_svc
+
+users_db_dep  -right-> users_db_vol
+posts_db_dep  -right-> posts_db_vol
+offers_db_dep -right-> offers_db_vol
+routes_db_dep -right-> routes_db_vol
+
+note bottom
+  Los servicios *-app-service son NodePort (acceso externo).
+  Los servicios *-db-service son ClusterIP (solo interno al clúster).
+  Los volúmenes *-db-volumen son emptyDir: no persistentes,
+  sobreviven únicamente al ciclo de vida del pod.
+end note
+
+@enduml
