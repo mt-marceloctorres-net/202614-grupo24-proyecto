@@ -2,15 +2,15 @@ team:
    name: Cargo tu encargo
    members:
       - user: c.caicedob
-        percentage: <0 a 100>
+        percentage: 25
       - user: of.munoz
-        percentage: <0 a 100>
+        percentage: 25
       - user: mar-torr
-        percentage: <0 a 100>
+        percentage: 25
       - user: mc.torreso1
-        percentage: <0 a 100>
+        percentage: 25
 board: https://github.com/orgs/MISW-4301-Desarrollo-Apps-en-la-Nube/projects/336
-docs: <link al github pages del equipo>
+docs: https://refactored-dollop-qwj93z8.pages.github.io/
 users_app:
   folder: users_app
   image_name: users_app
