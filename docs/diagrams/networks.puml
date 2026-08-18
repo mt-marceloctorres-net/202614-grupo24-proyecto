@@ -74,25 +74,6 @@ frame "K8s" as k8s_frame #line.dashed {
     }
   }
 
-  frame "offers-network" {
-    frame "offers_app" as offers_app_zone {
-      component "offers-app-service" as offers_app_svc
-      frame "offers-app" as offers_app_pod <<Pod>> {
-        frame "Contenedor" as offers_app_ctr_f {
-          hexagon "offers_app" as offers_app_ctr
-        }
-      }
-    }
-    frame "offers_db" as offers_db_zone {
-      component "offers-db-service" as offers_db_svc
-      frame "offers-db" as offers_db_pod <<Pod>> {
-        frame "Contenedor" as offers_db_ctr_f {
-          database "offers_db" as offers_db_ctr
-        }
-      }
-    }
-  }
-
   frame "routes-network" {
     frame "routes_app" as routes_app_zone {
       component "routes-app-service" as routes_app_svc
@@ -111,38 +92,57 @@ frame "K8s" as k8s_frame #line.dashed {
       }
     }
   }
+
+  frame "offers-network" {
+    frame "offers_app" as offers_app_zone {
+      component "offers-app-service" as offers_app_svc
+      frame "offers-app" as offers_app_pod <<Pod>> {
+        frame "Contenedor" as offers_app_ctr_f {
+          hexagon "offers_app" as offers_app_ctr
+        }
+      }
+    }
+    frame "offers_db" as offers_db_zone {
+      component "offers-db-service" as offers_db_svc
+      frame "offers-db" as offers_db_pod <<Pod>> {
+        frame "Contenedor" as offers_db_ctr_f {
+          database "offers_db" as offers_db_ctr
+        }
+      }
+    }
+  }
  }
 }
 
 circle "NodePort\n30000" as np_users
 circle "NodePort\n30001" as np_posts
-circle "NodePort\n30003" as np_offers
 circle "NodePort\n30002" as np_routes
+circle "NodePort\n30003" as np_offers
 
 client ..> np_users
 client ..> np_posts
-client ..> np_offers
 client ..> np_routes
+client ..> np_offers
 
 np_users  -down-> users_app_svc  : "80"
 np_posts  -down-> posts_app_svc  : "80"
-np_offers -down-> offers_app_svc : "80"
 np_routes -down-> routes_app_svc : "80"
+np_offers -down-> offers_app_svc : "80"
 
 users_app_svc  -down-> users_app_pod
 posts_app_svc  -down-> posts_app_pod
-offers_app_svc -down-> offers_app_pod
 routes_app_svc -down-> routes_app_pod
+offers_app_svc -down-> offers_app_pod
 
 users_app_pod  -down-> users_db_svc  : "5432"
 posts_app_pod  -down-> posts_db_svc  : "5432"
-offers_app_pod -down-> offers_db_svc : "5432"
 routes_app_pod -down-> routes_db_svc : "5432"
+offers_app_pod -down-> offers_db_svc : "5432"
 
 users_db_svc  -down-> users_db_pod
 posts_db_svc  -down-> posts_db_pod
-offers_db_svc -down-> offers_db_pod
 routes_db_svc -down-> routes_db_pod
+offers_db_svc -down-> offers_db_pod
 
 legend left
   <b>Convenciones
