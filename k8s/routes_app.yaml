@@ -154,8 +154,12 @@ spec:
   selector:
     app: routes-app
   ports:
-    - port: 9000
+    # Puerto 80 y nodePort 30002 según el modelo de red oficial del curso
+    # (docs/images/network.png): users=30000, posts=30001, routes=30002,
+    # offers=30003. targetPort es el puerto real del contenedor (9000).
+    - port: 80
       targetPort: 9000
+      nodePort: 30002
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
