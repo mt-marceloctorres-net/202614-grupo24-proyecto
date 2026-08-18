@@ -1,10 +1,12 @@
 @startuml deployment
 
 title Vista de despliegue — Modelo de despliegue (Entrega 1, Minikube)
-left to right direction
 skinparam shadowing false
 skinparam backgroundColor white
 skinparam roundCorner 10
+skinparam linetype ortho
+skinparam nodesep 45
+skinparam ranksep 30
 skinparam ArrowColor #1B1B1B
 skinparam hexagon {
   BackgroundColor #FCE4EC
@@ -32,110 +34,119 @@ skinparam legend {
   BackgroundColor #FCE8A8
   BorderColor #1B1B1B
 }
+skinparam note {
+  BackgroundColor #FFFFFF
+  BorderColor #1B1B1B
+}
+skinparam cloud {
+  FontSize 26
+  BackgroundColor #F5F5F5
+  BorderColor #616161
+}
 
-actor "Usuario\n(Postman)" as client
+cloud "Internet" as client
 
 frame "K8s — namespace: default" {
 
-  ' Columna 1: Service de cada app (NodePort, punto de entrada externo)
-  together {
-    component "users-app-service" as users_app_svc
-    component "posts-app-service" as posts_app_svc
-    component "offers-app-service" as offers_app_svc
-    component "routes-app-service" as routes_app_svc
-  }
-
-  ' Columna 2: Pod de cada app (frame = Pod, hexágono = contenedor)
-  together {
-    frame "users-app" as users_app_pod {
-      hexagon "users_app" as users_app_img
+  frame " " as offers_group #line:white {
+    frame "offers-app" as offers_app_pod <<Pod>> {
+      frame "Contenedor" as offers_app_ctr_f {
+        hexagon "offers_app" as offers_app_img
+      }
     }
-    frame "posts-app" as posts_app_pod {
-      hexagon "posts_app" as posts_app_img
+    component "offers-app-service" as offers_app_svc <<NodePort 30003>>
+    frame "offers-db" as offers_db_pod <<Pod>> {
+      frame "Contenedor" as offers_db_ctr_f {
+        database "offers_db" as offers_db_img
+      }
     }
-    frame "offers-app" as offers_app_pod {
-      hexagon "offers_app" as offers_app_img
-    }
-    frame "routes-app" as routes_app_pod {
-      hexagon "routes_app" as routes_app_img
-    }
-  }
-
-  ' Columna 3: Service de cada base de datos (ClusterIP, solo interno)
-  together {
-    component "users-db-service" as users_db_svc
-    component "posts-db-service" as posts_db_svc
     component "offers-db-service" as offers_db_svc
-    component "routes-db-service" as routes_db_svc
-  }
-
-  ' Columna 4: Pod de cada base de datos (frame = Pod, cilindro = contenedor Postgres)
-  together {
-    frame "users-db" as users_db_pod {
-      database "users_db" as users_db_img
-    }
-    frame "posts-db" as posts_db_pod {
-      database "posts_db" as posts_db_img
-    }
-    frame "offers-db" as offers_db_pod {
-      database "offers_db" as offers_db_img
-    }
-    frame "routes-db" as routes_db_pod {
-      database "routes_db" as routes_db_img
-    }
-  }
-
-  ' Columna 5: volumen emptyDir montado en el Pod de cada base de datos
-  together {
-    artifact "users-db-volumen" as users_db_vol
-    artifact "posts-db-volumen" as posts_db_vol
     artifact "offers-db-volumen" as offers_db_vol
+  }
+
+  frame " " as routes_group #line:white {
+    frame "routes-app" as routes_app_pod <<Pod>> {
+      frame "Contenedor" as routes_app_ctr_f {
+        hexagon "routes_app" as routes_app_img
+      }
+    }
+    component "routes-app-service" as routes_app_svc <<NodePort 30002>>
+    frame "routes-db" as routes_db_pod <<Pod>> {
+      frame "Contenedor" as routes_db_ctr_f {
+        database "routes_db" as routes_db_img
+      }
+    }
+    component "routes-db-service" as routes_db_svc
     artifact "routes-db-volumen" as routes_db_vol
+  }
+
+  frame " " as posts_group #line:white {
+    frame "posts-app" as posts_app_pod <<Pod>> {
+      frame "Contenedor" as posts_app_ctr_f {
+        hexagon "posts_app" as posts_app_img
+      }
+    }
+    component "posts-app-service" as posts_app_svc <<NodePort 30001>>
+    frame "posts-db" as posts_db_pod <<Pod>> {
+      frame "Contenedor" as posts_db_ctr_f {
+        database "posts_db" as posts_db_img
+      }
+    }
+    component "posts-db-service" as posts_db_svc
+    artifact "posts-db-volumen" as posts_db_vol
+  }
+
+  frame " " as users_group #line:white {
+    frame "users-app" as users_app_pod <<Pod>> {
+      frame "Contenedor" as users_app_ctr_f {
+        hexagon "users_app" as users_app_img
+      }
+    }
+    component "users-app-service" as users_app_svc <<NodePort 30000>>
+    frame "users-db" as users_db_pod <<Pod>> {
+      frame "Contenedor" as users_db_ctr_f {
+        database "users_db" as users_db_img
+      }
+    }
+    component "users-db-service" as users_db_svc
+    artifact "users-db-volumen" as users_db_vol
   }
 }
 
-client ..> users_app_svc : NodePort 30000
-client ..> posts_app_svc : NodePort 30001
-client ..> offers_app_svc : NodePort 30003
-client ..> routes_app_svc : NodePort 30002
+client .down.> users_app_svc
+client .down.> posts_app_svc
+client .down.> routes_app_svc
+client .down.> offers_app_svc
 
-users_app_svc  --> users_app_pod  : "80 -> 9000"
-posts_app_svc  --> posts_app_pod  : "80 -> 9000"
-offers_app_svc --> offers_app_pod : "80 -> 9000"
-routes_app_svc --> routes_app_pod : "80 -> 9000"
+users_app_svc  -down-> users_app_pod  : "80 -> 9000"
+posts_app_svc  -down-> posts_app_pod  : "80 -> 9000"
+routes_app_svc -down-> routes_app_pod : "80 -> 9000"
+offers_app_svc -down-> offers_app_pod : "80 -> 9000"
 
-users_app_pod  --> users_db_svc  : "5432 (ClusterIP)"
-posts_app_pod  --> posts_db_svc  : "5432 (ClusterIP)"
-offers_app_pod --> offers_db_svc : "5432 (ClusterIP)"
-routes_app_pod --> routes_db_svc : "5432 (ClusterIP)"
+users_app_pod  -down-> users_db_svc  : "5432"
+posts_app_pod  -down-> posts_db_svc  : "5432"
+routes_app_pod -down-> routes_db_svc : "5432"
+offers_app_pod -down-> offers_db_svc : "5432"
 
-users_db_svc  --> users_db_pod
-posts_db_svc  --> posts_db_pod
-offers_db_svc --> offers_db_pod
-routes_db_svc --> routes_db_pod
+users_db_svc  -down-> users_db_pod
+posts_db_svc  -down-> posts_db_pod
+routes_db_svc -down-> routes_db_pod
+offers_db_svc -down-> offers_db_pod
 
-users_db_pod  --> users_db_vol  : mount
-posts_db_pod  --> posts_db_vol  : mount
-offers_db_pod --> offers_db_vol : mount
-routes_db_pod --> routes_db_vol : mount
+users_db_pod  -down-> users_db_vol  : mount
+posts_db_pod  -down-> posts_db_vol  : mount
+routes_db_pod -down-> routes_db_vol : mount
+offers_db_pod -down-> offers_db_vol : mount
 
 legend left
   <b>Convenciones
   ----
-  [ Frame verde ]  Pod - K8s (agrupa 1 contenedor)
-  Hexágono rosa  contenedor de la app (imagen <app>_app)
-  Cilindro azul  contenedor Postgres (imagen postgres:16)
+  [ Pod ]  frame verde, agrupa un contenedor
+  [ Contenedor ]  hexágono rosa (app) o cilindro azul (Postgres)
   Azul claro  Service - K8s (NodePort o ClusterIP)
   Documento gris  volumen emptyDir montado en el pod
   ..> Comunicación externa (NodePort, fuera del clúster)
   --> Comunicación interna (dentro del clúster)
 endlegend
-
-note bottom
-  Los servicios *-app-service son NodePort (acceso externo).
-  Los servicios *-db-service son ClusterIP (solo interno al clúster).
-  Los volúmenes *-db-volumen son emptyDir: no persistentes,
-  sobreviven únicamente al ciclo de vida del pod.
-end note
 
 @enduml
