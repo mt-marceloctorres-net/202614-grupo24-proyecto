@@ -2,77 +2,134 @@
 
 title Vista de despliegue — Modelo de despliegue (Entrega 1, Minikube)
 left to right direction
-skinparam componentStyle rectangle
-
-actor "Cliente\n(Postman)" as client
-
-node "Minikube — namespace: default" {
-
-  frame "users-app" as users_app_dep {
-    hexagon "users_app" as users_app_img
-  }
-  component "users-app-service" as users_app_svc
-  frame "users-db" as users_db_dep {
-    database "users_db" as users_db_img
-  }
-  component "users-db-service" as users_db_svc
-  artifact "users-db-volumen" as users_db_vol
-
-  frame "posts-app" as posts_app_dep {
-    hexagon "posts_app" as posts_app_img
-  }
-  component "posts-app-service" as posts_app_svc
-  frame "posts-db" as posts_db_dep {
-    database "posts_db" as posts_db_img
-  }
-  component "posts-db-service" as posts_db_svc
-  artifact "posts-db-volumen" as posts_db_vol
-
-  frame "offers-app" as offers_app_dep {
-    hexagon "offers_app" as offers_app_img
-  }
-  component "offers-app-service" as offers_app_svc
-  frame "offers-db" as offers_db_dep {
-    database "offers_db" as offers_db_img
-  }
-  component "offers-db-service" as offers_db_svc
-  artifact "offers-db-volumen" as offers_db_vol
-
-  frame "routes-app" as routes_app_dep {
-    hexagon "routes_app" as routes_app_img
-  }
-  component "routes-app-service" as routes_app_svc
-  frame "routes-db" as routes_db_dep {
-    database "routes_db" as routes_db_img
-  }
-  component "routes-db-service" as routes_db_svc
-  artifact "routes-db-volumen" as routes_db_vol
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam roundCorner 10
+skinparam ArrowColor #1B1B1B
+skinparam hexagon {
+  BackgroundColor #FCE4EC
+  BorderColor #C2185B
+}
+skinparam database {
+  BackgroundColor #2F5FA8
+  FontColor white
+  BorderColor #1B3B6F
+}
+skinparam component {
+  BackgroundColor #BBDEFB
+  BorderColor #1565C0
+}
+skinparam artifact {
+  BackgroundColor #FAFAFA
+  BorderColor #616161
+}
+skinparam frame {
+  BackgroundColor #FFFFFF
+  BorderColor #2E7D32
+  FontColor #2E7D32
+}
+skinparam legend {
+  BackgroundColor #FCE8A8
+  BorderColor #1B1B1B
 }
 
-client --> users_app_svc : NodePort
-client --> posts_app_svc : NodePort
-client --> offers_app_svc : NodePort
-client --> routes_app_svc : NodePort
+actor "Usuario\n(Postman)" as client
 
-users_app_dep  -down-> users_app_svc
-posts_app_dep  -down-> posts_app_svc
-offers_app_dep -down-> offers_app_svc
-routes_app_dep -down-> routes_app_svc
+frame "K8s — namespace: default" {
 
-users_app_svc  ..> users_db_svc  : "5432 (ClusterIP)"
-posts_app_svc  ..> posts_db_svc  : "5432 (ClusterIP)"
-offers_app_svc ..> offers_db_svc : "5432 (ClusterIP)"
-routes_app_svc ..> routes_db_svc : "5432 (ClusterIP)"
+  ' Columna 1: Service de cada app (NodePort, punto de entrada externo)
+  together {
+    component "users-app-service" as users_app_svc
+    component "posts-app-service" as posts_app_svc
+    component "offers-app-service" as offers_app_svc
+    component "routes-app-service" as routes_app_svc
+  }
 
-users_db_dep  -down-> users_db_svc
-posts_db_dep  -down-> posts_db_svc
-offers_db_dep -down-> offers_db_svc
-routes_db_dep -down-> routes_db_svc
+  ' Columna 2: Pod de cada app (frame = Pod, hexágono = contenedor)
+  together {
+    frame "users-app" as users_app_pod {
+      hexagon "users_app" as users_app_img
+    }
+    frame "posts-app" as posts_app_pod {
+      hexagon "posts_app" as posts_app_img
+    }
+    frame "offers-app" as offers_app_pod {
+      hexagon "offers_app" as offers_app_img
+    }
+    frame "routes-app" as routes_app_pod {
+      hexagon "routes_app" as routes_app_img
+    }
+  }
 
-users_db_dep  -right-> users_db_vol
-posts_db_dep  -right-> posts_db_vol
-offers_db_dep -right-> offers_db_vol
-routes_db_dep -right-> routes_db_vol
+  ' Columna 3: Service de cada base de datos (ClusterIP, solo interno)
+  together {
+    component "users-db-service" as users_db_svc
+    component "posts-db-service" as posts_db_svc
+    component "offers-db-service" as offers_db_svc
+    component "routes-db-service" as routes_db_svc
+  }
+
+  ' Columna 4: Pod de cada base de datos (frame = Pod, cilindro = contenedor Postgres)
+  together {
+    frame "users-db" as users_db_pod {
+      database "users_db" as users_db_img
+    }
+    frame "posts-db" as posts_db_pod {
+      database "posts_db" as posts_db_img
+    }
+    frame "offers-db" as offers_db_pod {
+      database "offers_db" as offers_db_img
+    }
+    frame "routes-db" as routes_db_pod {
+      database "routes_db" as routes_db_img
+    }
+  }
+
+  ' Columna 5: volumen emptyDir montado en el Pod de cada base de datos
+  together {
+    artifact "users-db-volumen" as users_db_vol
+    artifact "posts-db-volumen" as posts_db_vol
+    artifact "offers-db-volumen" as offers_db_vol
+    artifact "routes-db-volumen" as routes_db_vol
+  }
+}
+
+client ..> users_app_svc : NodePort 30000
+client ..> posts_app_svc : NodePort 30001
+client ..> offers_app_svc : NodePort 30003
+client ..> routes_app_svc : NodePort 30002
+
+users_app_svc  --> users_app_pod  : "80 -> 9000"
+posts_app_svc  --> posts_app_pod  : "80 -> 9000"
+offers_app_svc --> offers_app_pod : "80 -> 9000"
+routes_app_svc --> routes_app_pod : "80 -> 9000"
+
+users_app_pod  --> users_db_svc  : "5432 (ClusterIP)"
+posts_app_pod  --> posts_db_svc  : "5432 (ClusterIP)"
+offers_app_pod --> offers_db_svc : "5432 (ClusterIP)"
+routes_app_pod --> routes_db_svc : "5432 (ClusterIP)"
+
+users_db_svc  --> users_db_pod
+posts_db_svc  --> posts_db_pod
+offers_db_svc --> offers_db_pod
+routes_db_svc --> routes_db_pod
+
+users_db_pod  --> users_db_vol  : mount
+posts_db_pod  --> posts_db_vol  : mount
+offers_db_pod --> offers_db_vol : mount
+routes_db_pod --> routes_db_vol : mount
+
+legend left
+  <b>Convenciones
+  ----
+  [ Frame verde ]  Pod - K8s (agrupa 1 contenedor)
+  Hexágono rosa  contenedor de la app (imagen <app>_app)
+  Cilindro azul  contenedor Postgres (imagen postgres:16)
+  Azul claro  Service - K8s (NodePort o ClusterIP)
+  Documento gris  volumen emptyDir montado en el pod
+  ..> Comunicación externa (NodePort, fuera del clúster)
+  --> Comunicación interna (dentro del clúster)
+endlegend
 
 note bottom
   Los servicios *-app-service son NodePort (acceso externo).
