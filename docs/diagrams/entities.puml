@@ -2,7 +2,26 @@
 
 title Vista de información — Entidades (Entrega 1)
 hide circle
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam roundCorner 18
 skinparam linetype ortho
+skinparam entity {
+  BackgroundColor #FEFEFE
+  BorderColor #1B1B1B
+  FontColor #1B1B1B
+}
+skinparam legend {
+  BackgroundColor #FCE8A8
+  BorderColor #1B1B1B
+}
+
+legend left
+  <b>Convenciones
+  ----
+  [ Entidad ]  Entidad
+  --> Relación (cardinalidad en el aro)
+endlegend
 
 entity "users" as users {
   * id : string <<uuid>>
@@ -57,10 +76,10 @@ entity "offers" as offers {
   createdAt : datetime
 }
 
-routes ||--o{ posts : routeId
-users  ||--o{ posts : userId
-posts  ||--o{ offers : postId
-users  ||--o{ offers : userId
+routes "1" <-- "1" posts : routeId
+users  "1" <-- "1" posts : userId
+posts  "1" <-- "*" offers : postId
+users  "1" <-- "*" offers : userId
 
 note bottom of offers
   Las relaciones son lógicas, no llaves foráneas
