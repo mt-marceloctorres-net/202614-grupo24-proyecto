@@ -93,13 +93,16 @@ Requiere Docker, Minikube y `kubectl`. Todas las apps exponen su API en el puert
    kubectl get pods,svc,networkpolicy -n default
    ```
 
-5. **Acceder a cada API** desde fuera del clúster, por el `Service` `NodePort` de cada app. Según el modelo de red oficial del curso (`docs/images/network.png`): `users=30000`, `posts=30001`, `routes=30002`, `offers=30003`. `users-app-service` todavía no fija el suyo — consúltelo con `kubectl get svc users-app-service -n default` mientras tanto:
+5. **Acceder a cada API** desde fuera del clúster, por el `Service` `NodePort` de cada app. Los cuatro siguen el modelo de red oficial del curso (`docs/images/network.png`), reflejado en `docs/diagrams/networks.puml`: `users=30000`, `posts=30001`, `routes=30002`, `offers=30003`, todos con `port: 80` en el Service y `targetPort: 9000` en el contenedor.
 
    ```bash
+   curl http://$(minikube ip):30000/users/ping    # users_app
    curl http://$(minikube ip):30001/posts/ping    # posts_app
    curl http://$(minikube ip):30002/routes/ping   # routes_app
    curl http://$(minikube ip):30003/offers/ping   # offers_app
    ```
+
+   En macOS con el driver de Docker la IP del nodo no es alcanzable directamente; en ese caso use `minikube service <app>-app-service --url` o `kubectl port-forward svc/<app>-app-service 9000:80`.
 
    Para probar el API completo de cada aplicación, importe en Postman la colección oficial correspondiente (`entrega1_users.json`, `entrega1_routes.json`, `entrega1_posts.json`, `entrega1_offers.json`) y apunte la variable de entorno al puerto expuesto.
 
