@@ -34,8 +34,8 @@ Este proyecto implementa el sistema en cuatro aplicaciones independientes (usuar
 
 - **GitHub**: [@ofmunozm](https://github.com/ofmunozm)
 - **Correo Uniandes**: `of.munoz@uniandes.edu.co`
-- **Rol actual**: _[Omar completa esto]_
-- **Intereses en ingeniería de software**: _[Omar completa esto]_
+- **Rol actual**: Product Manager en Mareigua, en el sector fintech. Coordino el desarrollo de productos digitales relacionados con procesamiento de datos y modelos predictivos, para los mercados colombiano y mexicano. Profesional en Finanzas de la Universidad Externado de Colombia y estudiante de la Maestría en Ingeniería de Software.
+- **Intereses en ingeniería de software**: Computación en la nube, datos e inteligencia artificial. Experiencia en el desarrollo de productos para la recolección y limpieza de datos y la generación de scores crediticios, donde la calidad del dato y la trazabilidad del modelo son determinantes. Interés particular en comprender y aplicar arquitecturas nativas en la nube para llevar ese tipo de productos a escala.
 
 ### Marco Tulio Torres Meneses
 
