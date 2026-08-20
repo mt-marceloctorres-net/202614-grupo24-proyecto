@@ -12,7 +12,7 @@ class Base(DeclarativeBase):
 
 def utcnow() -> datetime:
     """Fecha y hora actual en UTC, sin tzinfo (formato ISO yyyy-mm-ddTHH:MM:SS)."""
-    return datetime.now(timezone.utc).replace(tzinfo=None)
+    return datetime.now(timezone.utc).replace(tzinfo=None, microsecond=0)
 
 
 class OfferModel(Base):

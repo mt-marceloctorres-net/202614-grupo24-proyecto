@@ -35,7 +35,7 @@ class CreateRouteUseCase:
             )
 
         if route.createdAt is None:
-            route.createdAt = now
+            route.createdAt = now.replace(microsecond=0)
         if route.updatedAt is None:
             route.updatedAt = route.createdAt
 
