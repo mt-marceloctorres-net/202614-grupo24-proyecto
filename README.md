@@ -22,15 +22,14 @@ Sistema para conectar personas que necesitan enviar un paquete con viajeros que 
 ├── k8s/                     # Manifiestos de Kubernetes, uno por aplicación
 ├── docs/                    # Documentación técnica (Documentación como Código)
 │   └── diagrams/            # Diagramas PlantUML: entities, components, deployment, networks
-├── users_app/                # Gestión de usuarios
-├── routes_app/                # Gestión de trayectos
-├── posts_app/                  # Gestión de publicaciones
-├── offers_app/                  # Gestión de ofertas
-├── pets_app/                     # Ejemplo del curso (Python/Poetry/FastAPI/Pytest), no se despliega
-├── .vale.ini                 # Configuración para Vale. NO MODIFICAR
-├── config.yaml               # Configuración del repositorio. El archivo más importante
-├── makefile                  # Scripts para evaluación. NO MODIFICAR las reglas actuales
-└── README.md                 # Este archivo
+├── users_app/               # Gestión de usuarios
+├── routes_app/              # Gestión de trayectos
+├── posts_app/               # Gestión de publicaciones
+├── offers_app/              # Gestión de ofertas
+├── .vale.ini                # Configuración para Vale. NO MODIFICAR
+├── config.yaml              # Configuración del repositorio. El archivo más importante
+├── makefile                 # Scripts para evaluación. NO MODIFICAR las reglas actuales
+└── README.md                # Este archivo
 ```
 
 1. **`.github/workflows`**: los archivos en esta carpeta no se pueden modificar a excepción de `ci_evaluador_unit.yml`, usado para agregar un job por cada aplicación.
