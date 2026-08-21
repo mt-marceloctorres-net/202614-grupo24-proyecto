@@ -27,8 +27,8 @@ Este proyecto implementa el sistema en cuatro aplicaciones independientes (usuar
 
 - **GitHub**: [@CaicedoBz](https://github.com/CaicedoBz)
 - **Correo Uniandes**: `c.caicedob@uniandes.edu.co`
-- **Rol actual**: _[Carlos completa esto]_
-- **Intereses en ingeniería de software**: _[Carlos completa esto]_
+- **Rol actual**: Profesional de procura. Estudiante de la Maestría en Inteligencia Artificial de la Universidad de los Andes. Actualmente estoy desplegando una solución propia de gestión de negocios.
+- **Intereses en ingeniería de software**: Fortalecer las bases para construir mis propias soluciones. Mi perfil es más bien el de ideador de soluciones desde el aspecto administrativo, para reducir la operatividad de los procesos, así que este proyecto fue mi primera experiencia armando un servicio completo: arquitectura hexagonal, un contrato de API explícito, pruebas automatizadas y despliegue en contenedores. Me interesa sobre todo lo que hace que una solución se pueda mantener y escalar.
 
 ### Omar Fernando Muñoz
 
