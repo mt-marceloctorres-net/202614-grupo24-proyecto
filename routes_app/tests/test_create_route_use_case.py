@@ -90,6 +90,37 @@ def test_create_route_use_case_rejects_invalid_dates():
         use_case.execute(route)
 
 
+def test_create_route_truncates_microseconds_in_planned_dates():
+    """`plannedStartDate`/`plannedEndDate` se guardan sin microsegundos.
+
+    Vienen directo del cliente (a diferencia de `createdAt`, que genera el
+    servidor); sin truncar, `restrictions.md` queda incumplida aunque el
+    pipeline no valide el formato exacto.
+    """
+    repo = FakeRepository()
+    use_case = CreateRouteUseCase(repo)
+
+    route = Route(
+        flightId="FL2000",
+        sourceAirportCode="BOG",
+        sourceCountry="Colombia",
+        destinyAirportCode="MEX",
+        destinyCountry="Mexico",
+        bagCost=90,
+        plannedStartDate=datetime.now(timezone.utc)
+        + timedelta(days=1, microseconds=123456),
+        plannedEndDate=datetime.now(timezone.utc)
+        + timedelta(days=2, microseconds=654321),
+    )
+
+    created = use_case.execute(route)
+
+    assert created.plannedStartDate.microsecond == 0
+    assert created.plannedEndDate.microsecond == 0
+    assert created.plannedStartDate.tzinfo is None
+    assert created.plannedEndDate.tzinfo is None
+
+
 def test_create_route_use_case_rejects_past_dates():
     repo = FakeRepository()
     use_case = CreateRouteUseCase(repo)

@@ -17,7 +17,7 @@ class PostgresRouteRepositoryAdapter(RouteRepositoryPort):
         self.session_factory = session_factory
 
     def create(self, route: Route) -> Route:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(timezone.utc).replace(microsecond=0)
         if route.id is None:
             route.id = str(uuid4())
         if route.createdAt is None:

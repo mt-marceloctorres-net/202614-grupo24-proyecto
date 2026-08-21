@@ -41,7 +41,7 @@ spec:
                   name: users-db-secret
                   key: POSTGRES_PASSWORD
           volumeMounts:
-            - name: users-db-storage
+            - name: users-db-volumen
               mountPath: /var/lib/postgresql/data
           resources:
             requests:
@@ -61,7 +61,7 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
       volumes:
-        - name: users-db-storage
+        - name: users-db-volumen
           emptyDir: {}
 
 ---

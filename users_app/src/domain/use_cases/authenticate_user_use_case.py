@@ -22,7 +22,7 @@ class AuthenticateUserUseCase(BaseUseCase):
             raise InvalidCredentialsError("Usuario o contraseña inválidos")
 
         user.token = str(uuid.uuid4())
-        user.expireAt = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(
-            minutes=Settings.token_expiration_minutes
-        )
+        user.expireAt = datetime.now(timezone.utc).replace(
+            tzinfo=None, microsecond=0
+        ) + timedelta(minutes=Settings.token_expiration_minutes)
         return self.user_repository.update(user)

@@ -42,7 +42,7 @@ spec:
                   name: routes-db-secret
                   key: POSTGRES_PASSWORD
           volumeMounts:
-            - name: routes-db-storage
+            - name: routes-db-volumen
               mountPath: /var/lib/postgresql/data
           resources:
             requests:
@@ -62,7 +62,7 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
       volumes:
-        - name: routes-db-storage
+        - name: routes-db-volumen
           emptyDir: {}
 ---
 apiVersion: v1

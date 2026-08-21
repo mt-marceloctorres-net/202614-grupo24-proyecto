@@ -23,6 +23,7 @@ class CreatePostUseCase(BaseUseCase):
         """
         if expireAt.tzinfo is not None:
             expireAt = expireAt.astimezone(timezone.utc).replace(tzinfo=None)
+        expireAt = expireAt.replace(microsecond=0)
 
         now = datetime.now(timezone.utc).replace(tzinfo=None)
         if expireAt <= now:
