@@ -61,6 +61,29 @@ def test_create_post_normalizes_timezone_aware_expire_at(
     assert post.expireAt.tzinfo is None
 
 
+def test_create_post_truncates_microseconds_in_expire_at(
+    post_repository, valid_post_data
+):
+    """`expireAt` se guarda sin microsegundos, en formato ISO yyyy-mm-ddTHH:MM:SS.
+
+    La colección oficial del evaluador manda `expireAt` con milisegundos (ej.
+    `2026-08-23T16:33:24.266Z`); sin truncar, `restrictions.md` queda
+    incumplida aunque el pipeline no la valide explícitamente.
+    """
+    use_case = CreatePostUseCase(post_repository)
+    future_with_micros = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(
+        days=1, microseconds=123456
+    )
+
+    post = use_case.execute(
+        routeId=valid_post_data["routeId"],
+        userId=valid_post_data["userId"],
+        expireAt=future_with_micros,
+    )
+
+    assert post.expireAt.microsecond == 0
+
+
 def test_create_post_with_timezone_in_the_past_raises(post_repository, valid_post_data):
     """Una fecha con timezone que, normalizada, queda en el pasado también debe fallar."""
     use_case = CreatePostUseCase(post_repository)
