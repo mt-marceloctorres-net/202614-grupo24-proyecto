@@ -23,9 +23,9 @@ class CreateRouteUseCase:
                 f"Route with flightId {route.flightId} already exists"
             )
 
-        now = datetime.now(timezone.utc)
-        start = _as_aware_utc(route.plannedStartDate)
-        end = _as_aware_utc(route.plannedEndDate)
+        now = datetime.now(timezone.utc).replace(microsecond=0)
+        start = _as_aware_utc(route.plannedStartDate).replace(microsecond=0)
+        end = _as_aware_utc(route.plannedEndDate).replace(microsecond=0)
         if start <= now or end <= now:
             raise InvalidRouteDatesError("Las fechas del trayecto no son válidas")
 
@@ -34,8 +34,11 @@ class CreateRouteUseCase:
                 "La fecha de inicio debe ser anterior a la fecha de fin"
             )
 
+        route.plannedStartDate = start.replace(tzinfo=None)
+        route.plannedEndDate = end.replace(tzinfo=None)
+
         if route.createdAt is None:
-            route.createdAt = now.replace(microsecond=0)
+            route.createdAt = now
         if route.updatedAt is None:
             route.updatedAt = route.createdAt
 
