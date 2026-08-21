@@ -41,8 +41,8 @@ Este proyecto implementa el sistema en cuatro aplicaciones independientes (usuar
 
 - **GitHub**: [@mttm-maia](https://github.com/mttm-maia)
 - **Correo Uniandes**: `mar-torr@uniandes.edu.co`
-- **Rol actual**: _[Marco completa esto]_
-- **Intereses en ingeniería de software**: _[Marco completa esto]_
+- **Rol actual**: Ingeniero Eléctrico y Electrónico de la Universidad de los Andes, Especialista en Sistemas de Transmisión y Distribución de Energía Eléctrica y estudiante de la Maestría en Inteligencia Artificial de la Universidad de los Andes. Ingeniero de Diseño, a nivel de Especialista Electromecánico, en el mercado de Potencia y Energía de WSP Perú, con participación en proyectos de diseño, ingeniería y supervisión de obra de líneas de transmisión en la región (Perú, Colombia y Chile).
+- **Intereses en ingeniería de software**: Inteligencia artificial aplicada a la ingeniería y despliegue de aplicaciones en la nube. Interés en adquirir las habilidades necesarias para impulsar el desarrollo de aplicaciones basadas en herramientas de inteligencia artificial que resuelvan problemas de diversos tipos y contextos, tanto a nivel general como en los servicios de ingeniería de la empresa en la que trabajo. Específicamente, interés en implementar el despliegue de este tipo de aplicaciones en la nube, para facilitar su uso sin limitaciones de ubicación, espacio o tiempo, de manera segura y confiable.
 
 ### Marcelo Cesar Torres Ortiz
 
